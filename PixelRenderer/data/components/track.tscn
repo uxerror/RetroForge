@@ -1,0 +1,141 @@
+[gd_scene load_steps=8 format=3 uid="uid://wtuyheevyual"]
+
+[ext_resource type="Script" uid="uid://ba5q64wd2k0s6" path="res://PixelRenderer/data/scripts/track.gd" id="1_61ody"]
+[ext_resource type="Texture2D" uid="uid://dt7vukhh5pm4c" path="res://PixelRenderer/data/icons/anim_play.png" id="1_yhf4e"]
+[ext_resource type="Texture2D" uid="uid://bm2gonmtadb85" path="res://PixelRenderer/data/icons/anim_pause.png" id="2_61ody"]
+[ext_resource type="Texture2D" uid="uid://b3p50ln0p60ss" path="res://PixelRenderer/data/icons/anim_stop.png" id="3_68fmn"]
+[ext_resource type="Texture2D" uid="uid://sg16xfs24t3s" path="res://PixelRenderer/data/icons/anim_loop.png" id="4_lp60t"]
+[ext_resource type="Texture2D" uid="uid://dnwx3aaw136ru" path="res://PixelRenderer/data/icons/reset.png" id="5_yxxfn"]
+[ext_resource type="Texture2D" uid="uid://bikn1l8rdwp5w" path="res://PixelRenderer/data/icons/save_point.png" id="6_68fmn"]
+
+[node name="Track" type="VBoxContainer"]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_61ody")
+
+[node name="HBoxContainer7" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="AnimationSelector" type="OptionButton" parent="HBoxContainer7"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+clip_text = true
+fit_to_longest_item = false
+
+[node name="AnimPlayButton" type="Button" parent="HBoxContainer7"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+tooltip_text = "Play/ Pause"
+icon = ExtResource("1_yhf4e")
+icon_alignment = 1
+expand_icon = true
+
+[node name="AnimPauseButton" type="Button" parent="HBoxContainer7"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+tooltip_text = "Play/ Pause"
+icon = ExtResource("2_61ody")
+icon_alignment = 1
+expand_icon = true
+
+[node name="AnimStopButton" type="Button" parent="HBoxContainer7"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+tooltip_text = "Stop"
+icon = ExtResource("3_68fmn")
+icon_alignment = 1
+expand_icon = true
+
+[node name="AnimLoopToggleButton" type="Button" parent="HBoxContainer7"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+tooltip_text = "Loop Animation
+[for best results, drop one frame from end]"
+icon = ExtResource("4_lp60t")
+icon_alignment = 1
+expand_icon = true
+
+[node name="AddCheckpointButton" type="Button" parent="HBoxContainer7"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+tooltip_text = "Add checkpoint"
+icon = ExtResource("6_68fmn")
+icon_alignment = 1
+expand_icon = true
+
+[node name="AnimSlider" type="HSlider" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Visual feedback for current frame"
+tick_count = 10
+ticks_on_borders = true
+
+[node name="ExportOptions2" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label8" type="Label" parent="ExportOptions2"]
+layout_mode = 2
+text = " START:"
+
+[node name="StartSpin" type="SpinBox" parent="ExportOptions2"]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Set animation start frame"
+value = 1.0
+
+[node name="Label2" type="Label" parent="ExportOptions2"]
+layout_mode = 2
+text = " END:"
+
+[node name="EndSpin" type="SpinBox" parent="ExportOptions2"]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Set animation end frame"
+value = 30.0
+
+[node name="Label3" type="Label" parent="ExportOptions2"]
+layout_mode = 2
+text = " FPS:"
+
+[node name="FpsSpin" type="SpinBox" parent="ExportOptions2"]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Set animation playback speed"
+max_value = 60.0
+value = 12.0
+
+[node name="FrameResetButton" type="Button" parent="ExportOptions2"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+tooltip_text = "Reset animation parameters"
+icon = ExtResource("5_yxxfn")
+expand_icon = true
+
+[node name="Panel" type="Panel" parent="ExportOptions2"]
+custom_minimum_size = Vector2(72, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SavePointScrollContainer" type="ScrollContainer" parent="ExportOptions2/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+vertical_scroll_mode = 0
+
+[node name="CheckpointButtonsContainer" type="GridContainer" parent="ExportOptions2/Panel/SavePointScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+columns = 3

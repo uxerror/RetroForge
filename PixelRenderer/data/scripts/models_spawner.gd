@@ -1,218 +1,176 @@
 extends Node3D
+class_name ModelsSpawner
 
-signal model_spawned()
+signal model_loaded(model: Node3D)
+signal animation_player_setup(animation_player: AnimationPlayer)
 
 # UI References
 @onready var load_scene_button: Button = %LoadSceneButton
 @onready var load_scene_path: Label = %LoadScenePath
-
 @onready var load_texture_button: Button = %LoadTextureButton
 
-@onready var animation_selector: OptionButton = %AnimationSelector
-@onready var anim_play_button: Button = %AnimPlayButton
-@onready var anim_pause_button: Button = %AnimPauseButton
-@onready var anim_stop_button: Button = %AnimStopButton
-@onready var anim_loop_toggle_button: Button = %AnimLoopToggleButton
-@onready var anim_slider: HSlider = %AnimSlider
+@onready var add_track_button: Button = %AddTrackButton
+@onready var tracks_container: VBoxContainer = %TracksContainer
 
 @onready var temp_model: Node3D = %TempModel
+@onready var console: Console = %Console
 
-@onready var start_spin: SpinBox = %StartSpin
-@onready var end_spin: SpinBox = %EndSpin
+var active_track: Track = null
 
-# Console reference for logging
-@onready var console: TextEdit = %Console
-
-
-# File dialog for loading models
+# File dialogs
 var file_dialog: FileDialog
-
 var texture_dialog: FileDialog
 
-# Currently loaded model
+# Current model
 var loaded_model: Node3D = null
 var current_model_path: String = ""
-
-# Animation management
 var current_animation_player: AnimationPlayer = null
-var is_loop_enabled: bool = false
-var is_slider_being_dragged: bool = false
 
-# Frame-based animation control
-var animation_fps: float = 30.0  # Default FPS, will be updated from animation
-var start_frame: int = 0
-var end_frame: int = 0
-var total_frames: int = 0
-
-# Visual feedback colors
-var play_active_color: Color = Color(0.6, 0.8, 0.6)  # Muted green
-var loop_active_color: Color = Color(0.6, 0.7, 0.9)  # Muted blue
-var button_normal_color: Color = Color(1.0, 1.0, 1.0)  # Normal color
-
-# Auto-refresh management
+# Auto-refresh
 var auto_refresh_timer: Timer
 var last_animation_count: int = 0
 var last_model_node_count: int = 0
 
-# Reference to pixel_material for color sampling
+# Reference to pixel_material
 var pixel_material_script: Node
 
 func _ready():
-	# Initialize file dialog
 	_setup_file_dialog()
-	
-	# Connect the load button
+
 	load_scene_button.pressed.connect(_on_load_button_pressed)
-	
 	load_texture_button.pressed.connect(_on_load_texture_pressed)
-	
-	# Connect animation controls
-	_setup_animation_controls()
-	
-	# Set temp model as the initial loaded model
+	add_track_button.pressed.connect(_on_add_track_pressed)
+
+	# Use temp model as starting point
 	loaded_model = temp_model
-	
-	# Update the path label and find animation player
+	model_loaded.emit(loaded_model)
 	_update_path_label()
 	_setup_animation_player()
-	
-	# Setup auto-refresh timer
+
 	_setup_auto_refresh()
-	
-	# Get reference to pixel_material script for color sampling
 	_find_pixel_material_reference()
 
+# ------------------------------------------------
+# AUTO REFRESH
+# ------------------------------------------------
 func _setup_auto_refresh():
-	# Create auto-refresh timer to periodically check for animation changes
 	auto_refresh_timer = Timer.new()
-	auto_refresh_timer.wait_time = 1.0  # Check every second
+	auto_refresh_timer.wait_time = 1.0
 	auto_refresh_timer.timeout.connect(_on_auto_refresh_timer_timeout)
 	add_child(auto_refresh_timer)
 	auto_refresh_timer.start()
-	
-	console.log("Auto-refresh timer initialized - checking for animation changes every second")
 
 func _on_auto_refresh_timer_timeout():
-	# Check if the model structure or animations have changed
 	if loaded_model == null:
 		return
-	
-	# Count current nodes in the model (to detect model changes)
+
 	var current_node_count = _count_nodes_recursive(loaded_model)
-	
-	# Count current animations
 	var current_anim_count = 0
+
 	if current_animation_player != null:
-		var library = current_animation_player.get_animation_library("")
-		if library != null:
-			current_anim_count = library.get_animation_list().size()
-	
-	# Check if we need to refresh
-	var needs_refresh = false
-	
-	# Check if model structure changed
+		current_anim_count = _get_animation_count(current_animation_player)
+
+	var needs_refresh := false
+
 	if current_node_count != last_model_node_count:
-		console.log("Model structure changed - triggering refresh")
+		console.text += "Model structure changed - refreshing\n"
 		needs_refresh = true
 		last_model_node_count = current_node_count
-	
-	# Check if animation count changed
+
 	if current_anim_count != last_animation_count:
-		console.log("Animation count changed from " + str(last_animation_count) + " to " + str(current_anim_count) + " - triggering refresh")
+		console.text += "Animation count changed - refreshing\n"
 		needs_refresh = true
 		last_animation_count = current_anim_count
-	
-	# Check if AnimationPlayer was lost/found
+
 	var found_player = _find_animation_player(loaded_model)
 	if (found_player == null) != (current_animation_player == null):
-		console.log("AnimationPlayer availability changed - triggering refresh")
+		console.text += "AnimationPlayer availability changed - refreshing\n"
 		needs_refresh = true
-	
+
 	if needs_refresh:
-		_refresh_animation_controls()
+		_setup_animation_player()
+
+func _get_animation_count(player: AnimationPlayer) -> int:
+	var count = 0
+	for lib_name in player.get_animation_library_list():
+		var library = player.get_animation_library(lib_name)
+		count += library.get_animation_list().size()
+	return count
 
 func _count_nodes_recursive(node: Node) -> int:
-	var count = 1  # Count the current node
+	var count = 1
 	for child in node.get_children():
 		count += _count_nodes_recursive(child)
 	return count
 
-func _refresh_animation_controls():
-	console.log("Refreshing animation controls...")
-	_setup_animation_player()
+# ------------------------------------------------
+# TRACK MANAGEMENT
+# ------------------------------------------------
+func _on_add_track_pressed():
+	var track_scene = preload("res://PixelRenderer/data/components/track.tscn")
+	var track: Track = track_scene.instantiate()
+	tracks_container.add_child(track)
 
-func _setup_animation_controls():
-	# Connect animation control buttons
-	anim_play_button.pressed.connect(_on_play_pressed)
-	anim_pause_button.pressed.connect(_on_pause_pressed)
-	anim_stop_button.pressed.connect(_on_stop_pressed)
-	anim_loop_toggle_button.pressed.connect(_on_loop_toggle_pressed)
-	
-	# Connect animation selector
-	animation_selector.item_selected.connect(_on_animation_selected)
-	
-	# Connect animation slider
-	anim_slider.drag_started.connect(_on_slider_drag_started)
-	anim_slider.drag_ended.connect(_on_slider_drag_ended)
-	anim_slider.value_changed.connect(_on_slider_value_changed)
-	
-	# Connect frame spinboxes
-	start_spin.value_changed.connect(_on_start_frame_changed)
-	end_spin.value_changed.connect(_on_end_frame_changed)
-	
-	# Set initial loop button state
-	_update_loop_button_visual()
-	_update_play_button_visual()
+	track.request_become_active.connect(_on_track_request_become_active)
 
-func _process(_delta):
-	# Update slider position during playback (if not being dragged)
-	if current_animation_player != null and not is_slider_being_dragged:
-		if current_animation_player.is_playing() and current_animation_player.current_animation != "":
-			# Check if animation exists before getting position
-			var library = current_animation_player.get_animation_library("")
-			if library != null and library.has_animation(current_animation_player.current_animation):
-				var current_position = current_animation_player.current_animation_position
-				var trimmed_duration = _get_trimmed_duration()
-				var trimmed_start_time = start_frame / animation_fps
-				var trimmed_end_time = end_frame / animation_fps
-				
-				# Check if we've reached the end frame and should stop/loop
-				if current_position >= trimmed_end_time:
-					if is_loop_enabled:
-						# Loop back to start frame
-						current_animation_player.seek(trimmed_start_time)
-					else:
-						# Stop at end frame
-						current_animation_player.stop()
-						anim_slider.value = 100.0
-						_update_play_button_visual()
-						return
-				
-				# Calculate relative position within trimmed range
-				var relative_position = current_position - trimmed_start_time
-				if trimmed_duration > 0 and relative_position >= 0:
-					anim_slider.value = (relative_position / trimmed_duration) * 100.0
-	
-	# Update button visuals
-	_update_play_button_visual()
+	if current_animation_player != null:
+		track.set_animation_player(current_animation_player)
 
+func _on_track_request_become_active(track: Track):
+	for t in tracks_container.get_children():
+		if t is Track:
+			t.set_active(t == track)
+	active_track = track
+
+func _update_tracks_with_player(player: AnimationPlayer):
+	for t in tracks_container.get_children():
+		if t is Track:
+			t.set_animation_player(player)
+			t.set_active(false)
+	active_track = null
+
+# ------------------------------------------------
+# ANIMATION PLAYER
+# ------------------------------------------------
+func _setup_animation_player():
+	current_animation_player = _find_animation_player(loaded_model)
+
+	if current_animation_player != null:
+		var anim_count = _get_animation_count(current_animation_player)
+		console.text += "Found AnimationPlayer with " + str(anim_count) + " animations\n"
+		last_animation_count = anim_count
+	else:
+		console.text += "No AnimationPlayer found in loaded model\n"
+		last_animation_count = 0
+
+	if loaded_model != null:
+		last_model_node_count = _count_nodes_recursive(loaded_model)
+
+	_update_tracks_with_player(current_animation_player)
+	animation_player_setup.emit(current_animation_player)
+
+func _find_animation_player(node: Node) -> AnimationPlayer:
+	if node is AnimationPlayer:
+		return node
+	for child in node.get_children():
+		var res = _find_animation_player(child)
+		if res != null:
+			return res
+	return null
+
+# ------------------------------------------------
+# MODEL / TEXTURE LOADING
+# ------------------------------------------------
 func _setup_file_dialog():
-	# Create file dialog
 	file_dialog = FileDialog.new()
 	file_dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE
 	file_dialog.access = FileDialog.ACCESS_FILESYSTEM
-	
-	# Set file filters for GLB and GLTF files
-	file_dialog.add_filter("*.glb", "GLB Files")
-	file_dialog.add_filter("*.gltf", "GLTF Files")
-	file_dialog.add_filter("*.fbx", "FBX Files")
-	
-	# Connect the file selected signal
+	file_dialog.add_filter("*.glb ; GLB Files")
+	file_dialog.add_filter("*.gltf ; GLTF Files")
+	file_dialog.add_filter("*.fbx ; FBX Files")
 	file_dialog.file_selected.connect(_on_file_selected)
-	
-	# Add to scene tree
 	add_child(file_dialog)
-	
+
 	texture_dialog = FileDialog.new()
 	texture_dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE
 	texture_dialog.access = FileDialog.ACCESS_FILESYSTEM
@@ -224,45 +182,46 @@ func _setup_file_dialog():
 	add_child(texture_dialog)
 
 func _on_load_button_pressed():
-	# Open the file dialog
 	file_dialog.popup_centered(Vector2i(800, 600))
 
 func _on_load_texture_pressed():
 	texture_dialog.popup_centered(Vector2i(800, 600))
 
 func _on_file_selected(path: String):
-	# Load the selected GLB/GLTF file
 	_load_model(path)
 
 func _on_texture_selected(path: String):
 	var img = Image.new()
 	var err = img.load(path)
 	if err != OK:
-		console.log("Failed to load texture: " + path)
+		console.text += "Failed to load texture: " + path + "\n"
 		return
 
 	var tex = ImageTexture.create_from_image(img)
-
 	_apply_texture_to_model(tex)
-	console.log("Applied texture: " + path.get_file())
+	console.text += "Applied texture: " + path.get_file() + "\n"
 
 func _apply_texture_to_model(tex: Texture2D):
 	if loaded_model == null:
-		console.log("No model loaded to apply texture")
+		console.text += "No model loaded\n"
 		return
-
 	_apply_texture_recursive(loaded_model, tex)
 
 func _apply_texture_recursive(node: Node, tex: Texture2D):
 	if node is MeshInstance3D:
 		for i in range(node.get_surface_override_material_count()):
 			var mat = node.get_active_material(i)
-			if mat == null or not (mat is StandardMaterial3D):
-				# Создаём новый материал если нет
+			if mat == null:
 				mat = StandardMaterial3D.new()
 				node.set_surface_override_material(i, mat)
 			
-			(mat as StandardMaterial3D).albedo_texture = tex
+			if mat is StandardMaterial3D:
+				(mat as StandardMaterial3D).albedo_texture = tex
+			else:
+				# If it's not a StandardMaterial3D, create a new one with the texture
+				var new_mat = StandardMaterial3D.new()
+				new_mat.albedo_texture = tex
+				node.set_surface_override_material(i, new_mat)
 
 	for child in node.get_children():
 		_apply_texture_recursive(child, tex)
@@ -270,342 +229,75 @@ func _apply_texture_recursive(node: Node, tex: Texture2D):
 func _load_model(path: String):
 	var scene: Node3D = null
 	var error: int = ERR_FILE_UNRECOGNIZED
-	
-	var extension := path.get_extension().to_lower()
-	
-	if extension in ["glb", "gltf"]:
+	var ext = path.get_extension().to_lower()
+
+	if ext in ["glb", "gltf"]:
 		var gltf = GLTFDocument.new()
 		var state = GLTFState.new()
-		
 		error = gltf.append_from_file(path, state)
 		if error == OK:
 			scene = gltf.generate_scene(state)
-	elif extension == "fbx":
+	elif ext == "fbx":
 		var fbx = FBXDocument.new()
 		var state = FBXState.new()
-		
 		error = fbx.append_from_file(path, state)
 		if error == OK:
 			scene = fbx.generate_scene(state)
 	else:
-		console.log("Unsupported format: " + extension)
-		load_scene_path.text = "Unsupported format: " + extension
+		console.text += "Unsupported format: " + ext + "\n"
+		load_scene_path.text = "Unsupported format: " + ext
 		return
-	
+
 	if error != OK or scene == null:
-		console.log("Failed to load model: " + path)
+		console.text += "Failed to load model: " + path + "\n"
 		load_scene_path.text = "Failed to load: " + path.get_file()
 		return
-	
-	if loaded_model != null:
+
+	# Remove previous loaded model (but keep temp_model)
+	if loaded_model != null and loaded_model != temp_model:
 		loaded_model.queue_free()
-	
+		await get_tree().process_frame
+	elif loaded_model == temp_model:
+		temp_model.queue_free()
+
 	add_child(scene)
 	loaded_model = scene
 	current_model_path = path
-	
+
 	_update_path_label()
 	_setup_animation_player()
-	
+
 	if pixel_material_script != null:
 		await get_tree().process_frame
 		await get_tree().process_frame
 		pixel_material_script.sample_colors_from_render()
-	
-	console.log("Successfully loaded model: " + path)
 
-func _setup_animation_player():
-	# Find AnimationPlayer in the loaded model
-	current_animation_player = _find_animation_player(loaded_model)
-	
-	if current_animation_player != null:
-		var library = current_animation_player.get_animation_library("")
-		var anim_count = library.get_animation_list().size() if library != null else 0
-		console.log("Found AnimationPlayer with " + str(anim_count) + " animations")
-		
-		_populate_animation_selector()
-		_enable_animation_controls(true)
-		
-		# Connect to animation finished signal for loop handling
-		if not current_animation_player.animation_finished.is_connected(_on_animation_finished):
-			current_animation_player.animation_finished.connect(_on_animation_finished)
-		
-		# Update tracking variables
-		last_animation_count = anim_count
-	else:
-		console.log("No AnimationPlayer found in loaded model")
-		_enable_animation_controls(false)
-		_clear_animation_selector()
-		last_animation_count = 0
-	
-	# Update model node count for change detection
-	if loaded_model != null:
-		last_model_node_count = _count_nodes_recursive(loaded_model)
+	console.text += "Loaded model: " + path + "\n"
 
-func _find_animation_player(node: Node) -> AnimationPlayer:
-	# Check if current node is an AnimationPlayer
-	if node is AnimationPlayer:
-		return node as AnimationPlayer
-	
-	# Recursively search children
-	for child in node.get_children():
-		var result = _find_animation_player(child)
-		if result != null:
-			return result
-	
-	return null
-
-func _populate_animation_selector():
-	# Clear existing items
-	animation_selector.clear()
-	
-	if current_animation_player == null:
-		return
-	
-	# Get animation library (assuming default library "")
-	var library = current_animation_player.get_animation_library("")
-	if library == null:
-		return
-	
-	# Add animations to selector
-	var animation_names = library.get_animation_list()
-	for anim_name in animation_names:
-		animation_selector.add_item(anim_name)
-	
-	# Select first animation if available
-	if animation_names.size() > 0:
-		animation_selector.selected = 0
-		var first_anim = animation_names[0]
-		current_animation_player.current_animation = first_anim
-		_setup_frame_controls()
-		_update_slider_range()
-
-func _clear_animation_selector():
-	animation_selector.clear()
-	animation_selector.add_item("No animations")
-
-func _enable_animation_controls(enabled: bool):
-	animation_selector.disabled = not enabled
-	anim_play_button.disabled = not enabled
-	anim_pause_button.disabled = not enabled
-	anim_stop_button.disabled = not enabled
-	anim_loop_toggle_button.disabled = not enabled
-	anim_slider.editable = enabled
-
-func _update_slider_range():
-	if current_animation_player == null:
-		anim_slider.value = 0
-		return
-	
-	# Slider represents percentage (0-100)
-	anim_slider.min_value = 0.0
-	anim_slider.max_value = 100.0
-	anim_slider.step = 0.1
-	anim_slider.value = 0.0
-
-func _update_loop_button_visual():
-	# Update button appearance based on loop state
-	if is_loop_enabled:
-		anim_loop_toggle_button.button_pressed = true
-		anim_loop_toggle_button.modulate = loop_active_color  # Muted blue when active
-	else:
-		anim_loop_toggle_button.button_pressed = false
-		anim_loop_toggle_button.modulate = button_normal_color  # Normal color
-
-# Animation Control Callbacks (removed - using new implementations below)
-
-func _on_loop_toggle_pressed():
-	is_loop_enabled = not is_loop_enabled
-	_update_loop_button_visual()
-	console.log("Loop toggled: " + str(is_loop_enabled))
-
-func _on_animation_selected(index: int):
-	if current_animation_player == null:
-		return
-	
-	var library = current_animation_player.get_animation_library("")
-	var animation_names = library.get_animation_list()
-	
-	if index >= 0 and index < animation_names.size():
-		var anim_name = animation_names[index]
-		current_animation_player.current_animation = anim_name
-		_setup_frame_controls()
-		_update_slider_range()
-		console.log("Selected animation: " + anim_name)
-
-func _on_slider_drag_started():
-	is_slider_being_dragged = true
-
-func _on_slider_drag_ended(_value_changed: bool):
-	is_slider_being_dragged = false
-
-func _on_slider_value_changed(value: float):
-	if current_animation_player == null:
-		return
-	
-	# Always respond to slider changes, whether dragging or not
-	# Convert percentage to frame position within trimmed range
-	var trimmed_duration = _get_trimmed_duration()
-	var target_relative_time = (value / 100.0) * trimmed_duration
-	var trimmed_start_time = start_frame / animation_fps
-	var target_position = trimmed_start_time + target_relative_time
-	
-	# Seek to the position
-	current_animation_player.seek(target_position)
-	
-	if is_slider_being_dragged:
-		console.log("Seeked to frame: " + str(int((target_position * animation_fps))) + " (position: " + str(target_position) + " seconds)")
-
-func _on_animation_finished(anim_name: String):
-	console.log("Animation finished: " + anim_name)
-	
-	# Handle looping
-	if is_loop_enabled and current_animation_player != null:
-		current_animation_player.play(anim_name)
-		console.log("Looping animation: " + anim_name)
-	else:
-		# Reset slider to beginning
-		anim_slider.value = 0.0
-
-
-# Frame-based animation control functions
-func _setup_frame_controls():
-	if current_animation_player == null:
-		return
-	
-	var animation_length = current_animation_player.current_animation_length
-	total_frames = int(animation_length * animation_fps)
-	
-	# Set spinbox ranges
-	start_spin.min_value = 0
-	start_spin.max_value = total_frames - 1
-	start_spin.value = 0
-	start_spin.step = 1
-	
-	end_spin.min_value = 1
-	end_spin.max_value = total_frames
-	end_spin.value = total_frames
-	end_spin.step = 1
-	
-	# Update internal values
-	start_frame = 0
-	end_frame = total_frames
-	
-	console.log("Setup frame controls - Total frames: " + str(total_frames) + " at " + str(animation_fps) + " FPS")
-
-func _get_trimmed_duration() -> float:
-	return (end_frame - start_frame) / animation_fps
-
-func _on_start_frame_changed(value: float):
-	start_frame = int(value)
-	
-	# Ensure start frame is not greater than or equal to end frame
-	if start_frame >= end_frame:
-		end_frame = start_frame + 1
-		end_spin.value = end_frame
-	
-	# Update end spin minimum to be at least start + 1
-	end_spin.min_value = start_frame + 1
-	
-	console.log("Start frame changed to: " + str(start_frame))
-	_update_slider_range()
-
-func _on_end_frame_changed(value: float):
-	end_frame = int(value)
-	
-	# Ensure end frame is greater than start frame
-	if end_frame <= start_frame:
-		start_frame = end_frame - 1
-		start_spin.value = start_frame
-	
-	# Update start spin maximum to be at most end - 1
-	start_spin.max_value = end_frame - 1
-	
-	console.log("End frame changed to: " + str(end_frame))
-	_update_slider_range()
-
-func _update_play_button_visual():
-	# Update play button appearance based on playing state
-	if current_animation_player != null and current_animation_player.is_playing():
-		anim_play_button.modulate = play_active_color  # Muted green when playing
-	else:
-		anim_play_button.modulate = button_normal_color  # Normal color
-
-# Override existing play function to include visual feedback
-func _on_play_pressed():
-	if current_animation_player == null:
-		return
-	
-	var selected_index = animation_selector.selected
-	if selected_index >= 0:
-		var library = current_animation_player.get_animation_library("")
-		var animation_names = library.get_animation_list()
-		if selected_index < animation_names.size():
-			var anim_name = animation_names[selected_index]
-			
-			# Start from the trimmed start position
-			var start_time = start_frame / animation_fps
-			current_animation_player.play(anim_name)
-			current_animation_player.seek(start_time)
-			
-			_update_play_button_visual()
-			console.log("Playing animation: " + anim_name + " from frame " + str(start_frame))
-
-# Override existing pause function to include visual feedback  
-func _on_pause_pressed():
-	if current_animation_player == null:
-		return
-	
-	if current_animation_player.is_playing():
-		current_animation_player.pause()
-		console.log("Animation paused")
-	else:
-		# Resume if paused
-		current_animation_player.play()
-		console.log("Animation resumed")
-	
-	_update_play_button_visual()
-
-# Override existing stop function to include visual feedback
-func _on_stop_pressed():
-	if current_animation_player == null:
-		return
-	
-	current_animation_player.stop()
-	anim_slider.value = 0.0
-	_update_play_button_visual()
-	console.log("Animation stopped")
-
-
+# ------------------------------------------------
+# HELPERS
+# ------------------------------------------------
 func _update_path_label():
-	if current_model_path == "":
-		load_scene_path.text = "No model loaded"
-	else:
-		# Show just the filename for cleaner display
-		load_scene_path.text = current_model_path.get_file()
+	load_scene_path.text = current_model_path.get_file() if current_model_path != "" else "No model loaded"
 
-# Public function to get the currently loaded model
 func get_loaded_model() -> Node3D:
 	return loaded_model
 
-# Public function to get the current model path
 func get_current_model_path() -> String:
 	return current_model_path
 
-# Public function to clear the loaded model
 func clear_loaded_model():
-	if loaded_model != null:
+	if loaded_model != null and loaded_model != temp_model:
 		loaded_model.queue_free()
-		loaded_model = null
+		loaded_model = temp_model
 		current_model_path = ""
 		_update_path_label()
-		console.log("Loaded model cleared") 
+		console.text += "Model cleared\n"
 
 func _find_pixel_material_reference():
-	# Find the PixelMaterial script node - it's a direct child of the root PixelRenderer node
-	var root_node = get_node("../../")  # Go up to the PixelRenderer root
+	var root_node = get_node("../../")
 	pixel_material_script = root_node.get_node_or_null("PixelMaterial")
 	if pixel_material_script != null:
-		console.log("Found PixelMaterial script reference")
+		console.text += "Found PixelMaterial reference\n"
 	else:
-		console.log("WARNING: PixelMaterial script not found - color sampling will not work")
+		console.text += "WARNING: PixelMaterial not found\n"

@@ -1,17 +1,13 @@
-[gd_scene load_steps=49 format=3 uid="uid://y4o6ttmh8hb4"]
+[gd_scene load_steps=44 format=3 uid="uid://y4o6ttmh8hb4"]
 
 [ext_resource type="Script" uid="uid://dhq1ywbp8nv12" path="res://PixelRenderer/data/scripts/PixelRenderer.gd" id="1_5ibnk"]
 [ext_resource type="Material" uid="uid://dn8s72rfum4y4" path="res://PixelRenderer/data/Gizmo.tres" id="2_6vt7t"]
 [ext_resource type="Theme" uid="uid://bcwmv53i5brfs" path="res://PixelRenderer/data/theme.tres" id="2_l23g4"]
 [ext_resource type="Material" uid="uid://bmhdt60ax1int" path="res://PixelRenderer/data/PixelMaterial.tres" id="3_v52r1"]
-[ext_resource type="Texture2D" uid="uid://dt7vukhh5pm4c" path="res://PixelRenderer/data/icons/anim_play.png" id="4_6wj3c"]
 [ext_resource type="Script" uid="uid://djqlmm1nu56mi" path="res://PixelRenderer/data/scripts/main_config_scroll_container.gd" id="4_g6ha7"]
 [ext_resource type="Texture2D" uid="uid://75s28vduypuu" path="res://PixelRenderer/data/icons/folder.png" id="4_sen5r"]
 [ext_resource type="Texture2D" uid="uid://d3o8isbpbhfrw" path="res://PixelRenderer.png" id="4_x1hdl"]
-[ext_resource type="Texture2D" uid="uid://bm2gonmtadb85" path="res://PixelRenderer/data/icons/anim_pause.png" id="5_t0cwl"]
-[ext_resource type="Texture2D" uid="uid://b3p50ln0p60ss" path="res://PixelRenderer/data/icons/anim_stop.png" id="6_l23g4"]
 [ext_resource type="Texture2D" uid="uid://duc0vk1lm3pej" path="res://PixelRenderer/data/icons/arrow_up.png" id="7_klpv1"]
-[ext_resource type="Texture2D" uid="uid://sg16xfs24t3s" path="res://PixelRenderer/data/icons/anim_loop.png" id="7_wwtbg"]
 [ext_resource type="Texture2D" uid="uid://7k7x8v1o7p4r" path="res://PixelRenderer/data/icons/adj_move.png" id="8_6vt7t"]
 [ext_resource type="Texture2D" uid="uid://dhmu2nm041i3" path="res://PixelRenderer/data/icons/arrow_down.png" id="8_75uvr"]
 [ext_resource type="Texture2D" uid="uid://ph4xy8gbtok2" path="res://PixelRenderer/data/icons/resolution.png" id="8_t0cwl"]
@@ -23,7 +19,6 @@
 [ext_resource type="Texture2D" uid="uid://dt5myij2v6fi5" path="res://PixelRenderer/data/icons/adj_scale.png" id="11_5xf31"]
 [ext_resource type="Script" uid="uid://8l5njo0tda0d" path="res://PixelRenderer/data/scripts/models_handler.gd" id="11_8egxh"]
 [ext_resource type="Texture2D" uid="uid://dfqjv7wsmr8w2" path="res://PixelRenderer/data/icons/axis.png" id="14_ilx0h"]
-[ext_resource type="Texture2D" uid="uid://bikn1l8rdwp5w" path="res://PixelRenderer/data/icons/save_point.png" id="15_owbk2"]
 [ext_resource type="Texture2D" uid="uid://do8j5up0p14f8" path="res://PixelRenderer/data/icons/origin.png" id="15_x1hdl"]
 [ext_resource type="Texture2D" uid="uid://kpkb6h35yaa0" path="res://PixelRenderer/data/icons/grid.png" id="16_5xf31"]
 [ext_resource type="Script" uid="uid://cy7ia51udvh3c" path="res://PixelRenderer/data/scripts/pixel_material.gd" id="16_yc5xn"]
@@ -77,8 +72,9 @@ bg_color = Color(0.117647, 0.117647, 0.117647, 1)
 size = Vector2(100, 100)
 orientation = 0
 
-[node name="PixelRenderer" type="Node3D"]
+[node name="PixelRenderer" type="Node3D" node_paths=PackedStringArray("sprite_sheet_check_box")]
 script = ExtResource("1_5ibnk")
+sprite_sheet_check_box = NodePath("CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer7/SpriteSheetCheckBox")
 
 [node name="Gizmo" type="Node3D" parent="."]
 
@@ -151,7 +147,7 @@ size = Vector2i(800, 800)
 
 [node name="Camera" type="Camera3D" parent="SubViewport"]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 0.7071067, 0.7071067, 0, -0.7071067, 0.7071067, 0, 56, 55)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 55)
 projection = 1
 size = 4.0
 
@@ -163,7 +159,9 @@ transform = Transform3D(0.5990237, -0.56123996, 0.57112193, 0, 0.7132504, 0.7009
 projection = 1
 size = 7.773
 
-[node name="MainUI" type="HBoxContainer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="MainUI" type="HBoxContainer" parent="CanvasLayer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -171,44 +169,44 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("2_l23g4")
 
-[node name="Spacer" type="Panel" parent="MainUI"]
+[node name="Spacer" type="Panel" parent="CanvasLayer/MainUI"]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MainUI"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="HSplitContainer" type="HSplitContainer" parent="MainUI/HBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MainConfigScrollContainer" type="ScrollContainer" parent="MainUI/HBoxContainer/HSplitContainer"]
+[node name="HSplitContainer" type="HSplitContainer" parent="CanvasLayer/MainUI/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MainConfigScrollContainer" type="ScrollContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("4_g6ha7")
 
-[node name="LeftPanel" type="VBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer"]
+[node name="LeftPanel" type="VBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="HBoxContainer9" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
+[node name="HBoxContainer9" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer9"]
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer9"]
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 texture = ExtResource("4_x1hdl")
 expand_mode = 2
 stretch_mode = 4
 
-[node name="TitleBar" type="VBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer9"]
+[node name="TitleBar" type="VBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer9"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 0
 
-[node name="Label5" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer9/TitleBar"]
+[node name="Label5" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer9/TitleBar"]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
@@ -217,7 +215,7 @@ text = "GODOT PIXEL RENDERER"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="Label6" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer9/TitleBar"]
+[node name="Label6" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer9/TitleBar"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.396889, 0.396889, 0.396889, 1)
@@ -227,13 +225,13 @@ text = "3D to PixelArt toolkit"
 horizontal_alignment = 1
 uppercase = true
 
-[node name="HSeparator4" type="HSeparator" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
+[node name="HSeparator4" type="HSeparator" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
 layout_mode = 2
 
-[node name="SceneLoaded" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
+[node name="SceneLoaded" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
 layout_mode = 2
 
-[node name="LoadSceneButton" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/SceneLoaded"]
+[node name="LoadSceneButton" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/SceneLoaded"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 36)
 layout_mode = 2
@@ -241,7 +239,7 @@ text = "LOAD"
 icon = ExtResource("4_sen5r")
 expand_icon = true
 
-[node name="LoadScenePath" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/SceneLoaded"]
+[node name="LoadScenePath" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/SceneLoaded"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -249,10 +247,10 @@ theme_override_colors/font_color = Color(0.473976, 0.473976, 0.473976, 1)
 text = "://path-to-loaded-asset"
 clip_text = true
 
-[node name="TextureLoaded" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
+[node name="TextureLoaded" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
 layout_mode = 2
 
-[node name="LoadTextureButton" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/TextureLoaded"]
+[node name="LoadTextureButton" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/TextureLoaded"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 36)
 layout_mode = 2
@@ -260,148 +258,17 @@ text = "LOAD TEXTURE"
 icon = ExtResource("4_sen5r")
 expand_icon = true
 
-[node name="LoadScenePath" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/TextureLoaded"]
+[node name="LoadScenePath" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/TextureLoaded"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.473976, 0.473976, 0.473976, 1)
 text = "://path-to-loaded-asset"
 clip_text = true
 
-[node name="HSeparator8" type="HSeparator" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
+[node name="HSeparator8" type="HSeparator" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer"]
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/normal = SubResource("StyleBoxFlat_l23g4")
-text = "ANIMATION"
-horizontal_alignment = 1
-vertical_alignment = 2
-
-[node name="HBoxContainer7" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
-layout_mode = 2
-
-[node name="AnimationSelector" type="OptionButton" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer7"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-clip_text = true
-fit_to_longest_item = false
-
-[node name="AnimPlayButton" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer7"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(36, 36)
-layout_mode = 2
-tooltip_text = "Play/ Pause"
-icon = ExtResource("4_6wj3c")
-icon_alignment = 1
-expand_icon = true
-
-[node name="AnimPauseButton" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer7"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(36, 36)
-layout_mode = 2
-tooltip_text = "Play/ Pause"
-icon = ExtResource("5_t0cwl")
-icon_alignment = 1
-expand_icon = true
-
-[node name="AnimStopButton" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer7"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(36, 36)
-layout_mode = 2
-tooltip_text = "Stop"
-icon = ExtResource("6_l23g4")
-icon_alignment = 1
-expand_icon = true
-
-[node name="AnimLoopToggleButton" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer7"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(36, 36)
-layout_mode = 2
-tooltip_text = "Loop Animation
-[for best results, drop one frame from end]"
-icon = ExtResource("7_wwtbg")
-icon_alignment = 1
-expand_icon = true
-
-[node name="AnimSlider" type="HSlider" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
-unique_name_in_owner = true
-layout_mode = 2
-tooltip_text = "Visual feedback for current frame"
-tick_count = 10
-ticks_on_borders = true
-
-[node name="ExportOptions2" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
-layout_mode = 2
-
-[node name="Label8" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportOptions2"]
-layout_mode = 2
-text = " START:"
-
-[node name="StartSpin" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportOptions2"]
-unique_name_in_owner = true
-layout_mode = 2
-tooltip_text = "Set animation start frame"
-value = 1.0
-
-[node name="Label2" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportOptions2"]
-layout_mode = 2
-text = " END:"
-
-[node name="EndSpin" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportOptions2"]
-unique_name_in_owner = true
-layout_mode = 2
-tooltip_text = "Set animation end frame"
-value = 30.0
-
-[node name="Label3" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportOptions2"]
-layout_mode = 2
-text = " FPS:"
-
-[node name="FpsSpin" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportOptions2"]
-unique_name_in_owner = true
-layout_mode = 2
-tooltip_text = "Set animation playback speed"
-max_value = 60.0
-value = 12.0
-
-[node name="FrameResetButton" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportOptions2"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(36, 36)
-layout_mode = 2
-tooltip_text = "Reset animation parameters"
-icon = ExtResource("9_ilx0h")
-expand_icon = true
-
-[node name="Panel" type="Panel" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
-custom_minimum_size = Vector2(36, 75)
-layout_mode = 2
-
-[node name="SavePointScrollContainer" type="ScrollContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_vertical = 3
-
-[node name="SavePointGridContainer" type="GridContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/Panel/SavePointScrollContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-columns = 3
-
-[node name="HSeparator9" type="HSeparator" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
-layout_mode = 2
-
-[node name="Label4" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
+[node name="Label4" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_l23g4")
@@ -409,17 +276,17 @@ text = " OUTPUT "
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="ExportResolution" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
+[node name="ExportResolution" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportResolution"]
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportResolution"]
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 texture = ExtResource("8_t0cwl")
 expand_mode = 2
 stretch_mode = 4
 
-[node name="Resolution" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportResolution"]
+[node name="Resolution" type="SpinBox" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportResolution"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
@@ -428,11 +295,11 @@ value = 100.0
 allow_greater = true
 suffix = "px"
 
-[node name="Label2" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportResolution"]
+[node name="Label2" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportResolution"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="PrefixText" type="LineEdit" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportResolution"]
+[node name="PrefixText" type="LineEdit" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportResolution"]
 unique_name_in_owner = true
 clip_contents = true
 custom_minimum_size = Vector2(186.53, 0)
@@ -442,11 +309,11 @@ tooltip_text = "Add naming prefix
 e.g. 'run1' will result in run1_0001"
 placeholder_text = "prefix text"
 
-[node name="Label3" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportResolution"]
+[node name="Label3" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportResolution"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ExportButton" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportResolution"]
+[node name="ExportButton" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportResolution"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(128, 0)
 layout_mode = 2
@@ -454,11 +321,11 @@ text = "EXPORT"
 icon = ExtResource("9_l23g4")
 expand_icon = true
 
-[node name="ExportOptions4" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
+[node name="ExportOptions4" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="SelectFolderButton" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportOptions4"]
+[node name="SelectFolderButton" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportOptions4"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(188, 36)
 layout_mode = 2
@@ -466,7 +333,7 @@ text = "EXPORT DIR"
 icon = ExtResource("4_sen5r")
 expand_icon = true
 
-[node name="ExportDirPath" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportOptions4"]
+[node name="ExportDirPath" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/ExportOptions4"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -474,46 +341,46 @@ theme_override_colors/font_color = Color(0.473976, 0.473976, 0.473976, 1)
 text = "://path-to-export-dir"
 clip_text = true
 
-[node name="ProgressBar" type="ProgressBar" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
+[node name="ProgressBar" type="ProgressBar" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
 
-[node name="HBoxContainer5" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
+[node name="HBoxContainer5" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
 layout_mode = 2
 
-[node name="PreviewImageCheckBox" type="CheckButton" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer5"]
+[node name="PreviewImageCheckBox" type="CheckButton" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer5"]
 unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Export preview (Hi-res)"
 text = " PREVIEW"
 alignment = 2
 
-[node name="Label5" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer5"]
+[node name="Label5" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer5"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="BgColorCheckBox" type="CheckButton" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer5"]
+[node name="BgColorCheckBox" type="CheckButton" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer5"]
 unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Set Background Color"
 text = "BG"
 
-[node name="BgColorPicker" type="ColorPickerButton" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer5"]
+[node name="BgColorPicker" type="ColorPickerButton" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer5"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 0)
 layout_mode = 2
 color = Color(1, 1, 1, 1)
 
-[node name="Label6" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer5"]
+[node name="Label6" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer5"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label4" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer5"]
+[node name="Label4" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer5"]
 layout_mode = 2
 text = "MODE:"
 
-[node name="ViewModeDropDown" type="OptionButton" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer5"]
+[node name="ViewModeDropDown" type="OptionButton" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer5"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(125, 0)
 layout_mode = 2
@@ -522,13 +389,23 @@ theme = ExtResource("2_l23g4")
 clip_text = true
 fit_to_longest_item = false
 
-[node name="HSeparator3" type="HSeparator" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
+[node name="HBoxContainer7" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
 layout_mode = 2
 
-[node name="HBoxContainer3" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
+[node name="SpriteSheetCheckBox" type="CheckButton" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer7"]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Export preview (Hi-res)"
+text = "SPRITE SHEET"
+alignment = 2
+
+[node name="HSeparator3" type="HSeparator" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer3"]
+[node name="HBoxContainer3" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer3"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -537,78 +414,68 @@ text = "ADJUSTMENTS"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="AddModelCameraConfigButton" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer3"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(36, 36)
+[node name="FoldableContainer2" type="FoldableContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
 layout_mode = 2
-icon = ExtResource("15_owbk2")
-icon_alignment = 1
-expand_icon = true
-
-[node name="FoldableContainer2" type="FoldableContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
-layout_mode = 2
-folded = true
 title = "Model"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2"]
-visible = false
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2"]
 layout_mode = 2
 
-[node name="PositionModelAdjust" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer"]
+[node name="PositionModelAdjust" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label7" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/PositionModelAdjust"]
+[node name="Label7" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/PositionModelAdjust"]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
 
-[node name="TextureRect" type="TextureRect" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/PositionModelAdjust"]
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/PositionModelAdjust"]
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 texture = ExtResource("8_6vt7t")
 expand_mode = 2
 stretch_mode = 4
 
-[node name="Label2" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/PositionModelAdjust"]
+[node name="Label2" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/PositionModelAdjust"]
 layout_mode = 2
 text = "X:"
 
-[node name="XPosSpin" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/PositionModelAdjust"]
+[node name="XPosSpin" type="SpinBox" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/PositionModelAdjust"]
 unique_name_in_owner = true
 layout_mode = 2
 step = 0.1
 allow_greater = true
 allow_lesser = true
 
-[node name="Label3" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/PositionModelAdjust"]
+[node name="Label3" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/PositionModelAdjust"]
 layout_mode = 2
 text = "Y:"
 
-[node name="YPosSpin" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/PositionModelAdjust"]
+[node name="YPosSpin" type="SpinBox" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/PositionModelAdjust"]
 unique_name_in_owner = true
 layout_mode = 2
 step = 0.1
 allow_greater = true
 allow_lesser = true
 
-[node name="Label4" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/PositionModelAdjust"]
+[node name="Label4" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/PositionModelAdjust"]
 layout_mode = 2
 text = "Z:"
 
-[node name="ZPosSpin" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/PositionModelAdjust"]
+[node name="ZPosSpin" type="SpinBox" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/PositionModelAdjust"]
 unique_name_in_owner = true
 layout_mode = 2
 step = 0.1
 allow_greater = true
 allow_lesser = true
 
-[node name="Label8" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/PositionModelAdjust"]
+[node name="Label8" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/PositionModelAdjust"]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
 
-[node name="PosResetButton" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/PositionModelAdjust"]
+[node name="PosResetButton" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/PositionModelAdjust"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -616,61 +483,61 @@ tooltip_text = "Reset position adjustments"
 icon = ExtResource("9_ilx0h")
 expand_icon = true
 
-[node name="RotationModelAdjust" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer"]
+[node name="RotationModelAdjust" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label5" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/RotationModelAdjust"]
+[node name="Label5" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/RotationModelAdjust"]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
 
-[node name="TextureRect" type="TextureRect" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/RotationModelAdjust"]
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/RotationModelAdjust"]
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 texture = ExtResource("10_x1hdl")
 expand_mode = 2
 stretch_mode = 4
 
-[node name="Label2" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/RotationModelAdjust"]
+[node name="Label2" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/RotationModelAdjust"]
 layout_mode = 2
 text = "X:"
 
-[node name="XRotSpin" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/RotationModelAdjust"]
+[node name="XRotSpin" type="SpinBox" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/RotationModelAdjust"]
 unique_name_in_owner = true
 layout_mode = 2
 step = 0.1
 allow_greater = true
 allow_lesser = true
 
-[node name="Label3" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/RotationModelAdjust"]
+[node name="Label3" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/RotationModelAdjust"]
 layout_mode = 2
 text = "Y:"
 
-[node name="YRotSpin" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/RotationModelAdjust"]
+[node name="YRotSpin" type="SpinBox" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/RotationModelAdjust"]
 unique_name_in_owner = true
 layout_mode = 2
 step = 0.1
 allow_greater = true
 allow_lesser = true
 
-[node name="Label4" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/RotationModelAdjust"]
+[node name="Label4" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/RotationModelAdjust"]
 layout_mode = 2
 text = "Z:"
 
-[node name="ZRotSpin" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/RotationModelAdjust"]
+[node name="ZRotSpin" type="SpinBox" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/RotationModelAdjust"]
 unique_name_in_owner = true
 layout_mode = 2
 step = 0.1
 allow_greater = true
 allow_lesser = true
 
-[node name="Label6" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/RotationModelAdjust"]
+[node name="Label6" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/RotationModelAdjust"]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
 
-[node name="RotResetButton" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/RotationModelAdjust"]
+[node name="RotResetButton" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/RotationModelAdjust"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -678,91 +545,89 @@ tooltip_text = "Reset rotation adjustments"
 icon = ExtResource("9_ilx0h")
 expand_icon = true
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label6" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/HBoxContainer2"]
+[node name="Label6" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
 
-[node name="HBoxContainer10" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer"]
+[node name="HBoxContainer10" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/HBoxContainer10"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/HBoxContainer10"]
 layout_mode = 2
 text = "Roatation Model Delta"
 
-[node name="RotationModelDeltaSpinBox" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/HBoxContainer10"]
+[node name="RotationModelDeltaSpinBox" type="SpinBox" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer2/VBoxContainer/HBoxContainer10"]
 unique_name_in_owner = true
 layout_mode = 2
 max_value = 360.0
 value = 45.0
 
-[node name="FoldableContainer" type="FoldableContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
+[node name="FoldableContainer" type="FoldableContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
 layout_mode = 2
-folded = true
 title = "Camera"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer"]
-visible = false
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer"]
 layout_mode = 2
 
-[node name="PositionCameraAdjust" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer"]
+[node name="PositionModelAdjust2" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label7" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/PositionCameraAdjust"]
+[node name="Label7" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/PositionModelAdjust2"]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
 
-[node name="TextureRect" type="TextureRect" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/PositionCameraAdjust"]
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/PositionModelAdjust2"]
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 texture = ExtResource("8_6vt7t")
 expand_mode = 2
 stretch_mode = 4
 
-[node name="Label2" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/PositionCameraAdjust"]
+[node name="Label2" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/PositionModelAdjust2"]
 layout_mode = 2
 text = "X:"
 
-[node name="XPosCameraSpin" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/PositionCameraAdjust"]
+[node name="XPosCameraSpin" type="SpinBox" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/PositionModelAdjust2"]
 unique_name_in_owner = true
 layout_mode = 2
 step = 0.1
 allow_greater = true
 allow_lesser = true
 
-[node name="Label3" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/PositionCameraAdjust"]
+[node name="Label3" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/PositionModelAdjust2"]
 layout_mode = 2
 text = "Y:"
 
-[node name="YPosCameraSpin" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/PositionCameraAdjust"]
+[node name="YPosCameraSpin" type="SpinBox" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/PositionModelAdjust2"]
 unique_name_in_owner = true
 layout_mode = 2
 step = 0.1
 allow_greater = true
 allow_lesser = true
 
-[node name="Label4" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/PositionCameraAdjust"]
+[node name="Label4" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/PositionModelAdjust2"]
 layout_mode = 2
 text = "Z:"
 
-[node name="ZPosCameraSpin" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/PositionCameraAdjust"]
+[node name="ZPosCameraSpin" type="SpinBox" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/PositionModelAdjust2"]
 unique_name_in_owner = true
 layout_mode = 2
 step = 0.1
 allow_greater = true
 allow_lesser = true
 
-[node name="Label8" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/PositionCameraAdjust"]
+[node name="Label8" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/PositionModelAdjust2"]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
 
-[node name="PosCameraResetButton" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/PositionCameraAdjust"]
+[node name="PosCameraResetButton" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/PositionModelAdjust2"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -770,61 +635,61 @@ tooltip_text = "Reset position adjustments"
 icon = ExtResource("9_ilx0h")
 expand_icon = true
 
-[node name="RotationCameraAdjust" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer"]
+[node name="RotationModelAdjust2" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label5" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/RotationCameraAdjust"]
+[node name="Label5" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/RotationModelAdjust2"]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
 
-[node name="TextureRect" type="TextureRect" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/RotationCameraAdjust"]
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/RotationModelAdjust2"]
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 texture = ExtResource("10_x1hdl")
 expand_mode = 2
 stretch_mode = 4
 
-[node name="Label2" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/RotationCameraAdjust"]
+[node name="Label2" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/RotationModelAdjust2"]
 layout_mode = 2
 text = "X:"
 
-[node name="XRotCameraSpin" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/RotationCameraAdjust"]
+[node name="XRotCameraSpin" type="SpinBox" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/RotationModelAdjust2"]
 unique_name_in_owner = true
 layout_mode = 2
 step = 0.1
 allow_greater = true
 allow_lesser = true
 
-[node name="Label3" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/RotationCameraAdjust"]
+[node name="Label3" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/RotationModelAdjust2"]
 layout_mode = 2
 text = "Y:"
 
-[node name="YRotCameraSpin" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/RotationCameraAdjust"]
+[node name="YRotCameraSpin" type="SpinBox" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/RotationModelAdjust2"]
 unique_name_in_owner = true
 layout_mode = 2
 step = 0.1
 allow_greater = true
 allow_lesser = true
 
-[node name="Label4" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/RotationCameraAdjust"]
+[node name="Label4" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/RotationModelAdjust2"]
 layout_mode = 2
 text = "Z:"
 
-[node name="ZRotCameraSpin" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/RotationCameraAdjust"]
+[node name="ZRotCameraSpin" type="SpinBox" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/RotationModelAdjust2"]
 unique_name_in_owner = true
 layout_mode = 2
 step = 0.1
 allow_greater = true
 allow_lesser = true
 
-[node name="Label6" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/RotationCameraAdjust"]
+[node name="Label6" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/RotationModelAdjust2"]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
 
-[node name="RotCameraResetButton" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/RotationCameraAdjust"]
+[node name="RotCameraResetButton" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/RotationModelAdjust2"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -832,15 +697,15 @@ tooltip_text = "Reset rotation adjustments"
 icon = ExtResource("9_ilx0h")
 expand_icon = true
 
-[node name="HBoxContainer13" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer"]
+[node name="HBoxContainer13" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label6" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer13"]
+[node name="Label6" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer13"]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
 
-[node name="Button_Camera_Up" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer13"]
+[node name="Button_Camera_Up" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer13"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -848,7 +713,7 @@ icon = ExtResource("7_klpv1")
 icon_alignment = 1
 expand_icon = true
 
-[node name="Button_Camera_Down" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer13"]
+[node name="Button_Camera_Down" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer13"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -856,7 +721,7 @@ icon = ExtResource("8_75uvr")
 icon_alignment = 1
 expand_icon = true
 
-[node name="Button_Camera_Left" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer13"]
+[node name="Button_Camera_Left" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer13"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -864,7 +729,7 @@ icon = ExtResource("9_lbuph")
 icon_alignment = 1
 expand_icon = true
 
-[node name="Button_Camera_Right" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer13"]
+[node name="Button_Camera_Right" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer13"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -872,31 +737,31 @@ icon = ExtResource("10_3lf5q")
 icon_alignment = 1
 expand_icon = true
 
-[node name="Label8" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer13"]
+[node name="Label8" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer13"]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
 
-[node name="TextureRect" type="TextureRect" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer13"]
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer13"]
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 texture = ExtResource("11_5xf31")
 expand_mode = 2
 stretch_mode = 4
 
-[node name="CameraZoomSpin" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer13"]
+[node name="CameraZoomSpin" type="SpinBox" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer13"]
 unique_name_in_owner = true
 layout_mode = 2
 step = 0.1
 value = 4.0
 allow_greater = true
 
-[node name="Label9" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer13"]
+[node name="Label9" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer13"]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
 
-[node name="ZoomResetButton" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer13"]
+[node name="ZoomResetButton" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer13"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -904,34 +769,34 @@ tooltip_text = "Reset scale adjustment"
 icon = ExtResource("9_ilx0h")
 expand_icon = true
 
-[node name="HBoxContainer14" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer"]
+[node name="HBoxContainer14" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer14"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer14"]
 layout_mode = 2
 text = "Roatation Camera Delta"
 
-[node name="RotationCameraDeltaSpinBox" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer14"]
+[node name="RotationCameraDeltaSpinBox" type="SpinBox" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer/HBoxContainer14"]
 unique_name_in_owner = true
 layout_mode = 2
 max_value = 360.0
 value = 45.0
 
-[node name="HSeparator" type="HSeparator" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer"]
 layout_mode = 2
 text = "Camera Presets"
 
-[node name="CameraConfigOptionButton" type="OptionButton" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer"]
+[node name="CameraConfigOptionButton" type="OptionButton" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/FoldableContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="HSeparator5" type="HSeparator" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
+[node name="HSeparator5" type="HSeparator" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
 layout_mode = 2
 
-[node name="Lighting" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
+[node name="Lighting" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_l23g4")
@@ -940,59 +805,59 @@ horizontal_alignment = 1
 vertical_alignment = 2
 script = ExtResource("18_ilx0h")
 
-[node name="HBoxContainer4" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
+[node name="HBoxContainer4" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer4"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer4"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="KeyLightCheckButton" type="CheckButton" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer4"]
+[node name="KeyLightCheckButton" type="CheckButton" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer4"]
 unique_name_in_owner = true
 layout_mode = 2
 text = " KEY LIGHT"
 
-[node name="Label2" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer4"]
+[node name="Label2" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer4"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="KeyLightSpinBox" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer4"]
+[node name="KeyLightSpinBox" type="SpinBox" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer4"]
 unique_name_in_owner = true
 layout_mode = 2
 allow_greater = true
 
-[node name="Label5" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer4"]
+[node name="Label5" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer4"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="KeyLightColorPickerButton" type="ColorPickerButton" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer4"]
+[node name="KeyLightColorPickerButton" type="ColorPickerButton" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer4"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 
-[node name="Label4" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer4"]
+[node name="Label4" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer4"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="TextureRect" type="TextureRect" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer4"]
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer4"]
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 texture = ExtResource("10_x1hdl")
 expand_mode = 2
 stretch_mode = 4
 
-[node name="KeyLightRotSpin" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer4"]
+[node name="KeyLightRotSpin" type="SpinBox" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer4"]
 unique_name_in_owner = true
 layout_mode = 2
 step = 0.1
 allow_greater = true
 allow_lesser = true
 
-[node name="Label3" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer4"]
+[node name="Label3" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer4"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="KeyLightResetButton" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer4"]
+[node name="KeyLightResetButton" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer4"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -1000,59 +865,59 @@ tooltip_text = "Reset Key light"
 icon = ExtResource("9_ilx0h")
 expand_icon = true
 
-[node name="HBoxContainer6" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
+[node name="HBoxContainer6" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer6"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer6"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="FillLightCheckButton" type="CheckButton" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer6"]
+[node name="FillLightCheckButton" type="CheckButton" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer6"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "FILL LIGHT"
 
-[node name="Label2" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer6"]
+[node name="Label2" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer6"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="FillLightSpinBox" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer6"]
+[node name="FillLightSpinBox" type="SpinBox" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer6"]
 unique_name_in_owner = true
 layout_mode = 2
 allow_greater = true
 
-[node name="Label5" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer6"]
+[node name="Label5" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer6"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="FillLightColorPickerButton" type="ColorPickerButton" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer6"]
+[node name="FillLightColorPickerButton" type="ColorPickerButton" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer6"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 
-[node name="Label4" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer6"]
+[node name="Label4" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer6"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="TextureRect" type="TextureRect" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer6"]
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer6"]
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 texture = ExtResource("10_x1hdl")
 expand_mode = 2
 stretch_mode = 4
 
-[node name="FillLightRotSpin" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer6"]
+[node name="FillLightRotSpin" type="SpinBox" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer6"]
 unique_name_in_owner = true
 layout_mode = 2
 step = 0.1
 allow_greater = true
 allow_lesser = true
 
-[node name="Label3" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer6"]
+[node name="Label3" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer6"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="FillLightResetButton" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer6"]
+[node name="FillLightResetButton" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer6"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -1060,59 +925,59 @@ tooltip_text = "Reset Fill light"
 icon = ExtResource("9_ilx0h")
 expand_icon = true
 
-[node name="HBoxContainer8" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
+[node name="HBoxContainer8" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer8"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer8"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RimLightCheckButton" type="CheckButton" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer8"]
+[node name="RimLightCheckButton" type="CheckButton" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer8"]
 unique_name_in_owner = true
 layout_mode = 2
 text = " RIM LIGHT"
 
-[node name="Label2" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer8"]
+[node name="Label2" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer8"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RimLightSpinBox" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer8"]
+[node name="RimLightSpinBox" type="SpinBox" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer8"]
 unique_name_in_owner = true
 layout_mode = 2
 allow_greater = true
 
-[node name="Label5" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer8"]
+[node name="Label5" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer8"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RimLightColorPickerButton" type="ColorPickerButton" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer8"]
+[node name="RimLightColorPickerButton" type="ColorPickerButton" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer8"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 
-[node name="Label4" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer8"]
+[node name="Label4" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer8"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="TextureRect" type="TextureRect" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer8"]
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer8"]
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 texture = ExtResource("10_x1hdl")
 expand_mode = 2
 stretch_mode = 4
 
-[node name="RimLightRotSpin" type="SpinBox" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer8"]
+[node name="RimLightRotSpin" type="SpinBox" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer8"]
 unique_name_in_owner = true
 layout_mode = 2
 step = 0.1
 allow_greater = true
 allow_lesser = true
 
-[node name="Label3" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer8"]
+[node name="Label3" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer8"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RimLightResetButton" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer8"]
+[node name="RimLightResetButton" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/HBoxContainer8"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -1120,20 +985,20 @@ tooltip_text = "Reset Rim light"
 icon = ExtResource("9_ilx0h")
 expand_icon = true
 
-[node name="HSeparator6" type="HSeparator" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
+[node name="HSeparator6" type="HSeparator" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
 layout_mode = 2
 
-[node name="Gizmo" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
+[node name="Gizmo" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel"]
 layout_mode = 2
 theme_override_constants/separation = 20
 script = ExtResource("19_ilx0h")
 
-[node name="Label7" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/Gizmo"]
+[node name="Label7" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/Gizmo"]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
 
-[node name="Button_Axis" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/Gizmo"]
+[node name="Button_Axis" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/Gizmo"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
@@ -1141,7 +1006,7 @@ text = "AXIS"
 icon = ExtResource("14_ilx0h")
 expand_icon = true
 
-[node name="Button_Origin" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/Gizmo"]
+[node name="Button_Origin" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/Gizmo"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(140, 40)
 layout_mode = 2
@@ -1149,7 +1014,7 @@ text = "ORIGIN"
 icon = ExtResource("15_x1hdl")
 expand_icon = true
 
-[node name="Button_Floor" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/Gizmo"]
+[node name="Button_Floor" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/Gizmo"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(125, 40)
 layout_mode = 2
@@ -1157,39 +1022,39 @@ text = "FLOOR"
 icon = ExtResource("16_5xf31")
 expand_icon = true
 
-[node name="FloorColorPicker" type="ColorPickerButton" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/Gizmo"]
+[node name="FloorColorPicker" type="ColorPickerButton" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/Gizmo"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 color = Color(1, 1, 1, 1)
 
-[node name="Label8" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/Gizmo"]
+[node name="Label8" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer/LeftPanel/Gizmo"]
 layout_mode = 2
 size_flags_horizontal = 3
 horizontal_alignment = 2
 
-[node name="Renderer" type="VBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer"]
+[node name="Renderer" type="VBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Renderer" type="PanelContainer" parent="MainUI/HBoxContainer/HSplitContainer/Renderer"]
+[node name="Renderer" type="PanelContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_tkbio")
 
-[node name="BgColorRect" type="ColorRect" parent="MainUI/HBoxContainer/HSplitContainer/Renderer/Renderer"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-
-[node name="ViewportBackgroundColorRect" type="ColorRect" parent="MainUI/HBoxContainer/HSplitContainer/Renderer/Renderer"]
+[node name="ViewportBackgroundColorRect" type="ColorRect" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/Renderer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(800, 800)
 layout_mode = 2
 color = Color(0.0911215, 0.0911214, 0.0911214, 1)
 
-[node name="PixelCanvas" type="TextureRect" parent="MainUI/HBoxContainer/HSplitContainer/Renderer/Renderer"]
+[node name="BgColorRect" type="ColorRect" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/Renderer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="PixelCanvas" type="TextureRect" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/Renderer"]
 unique_name_in_owner = true
 texture_filter = 1
 material = ExtResource("3_v52r1")
@@ -1197,7 +1062,7 @@ layout_mode = 2
 texture = SubResource("ViewportTexture_tkbio")
 stretch_mode = 3
 
-[node name="ModelControlButtonPanel" type="GridContainer" parent="MainUI/HBoxContainer/HSplitContainer/Renderer/Renderer/PixelCanvas"]
+[node name="ModelControlButtonPanel" type="GridContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/Renderer/PixelCanvas"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = -1
@@ -1213,11 +1078,11 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 columns = 3
 
-[node name="Button_Model_Up_Right_Empty" type="AspectRatioContainer" parent="MainUI/HBoxContainer/HSplitContainer/Renderer/Renderer/PixelCanvas/ModelControlButtonPanel"]
+[node name="Button_Model_Up_Right_Empty" type="AspectRatioContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/Renderer/PixelCanvas/ModelControlButtonPanel"]
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 
-[node name="Button_Model_Up" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/Renderer/Renderer/PixelCanvas/ModelControlButtonPanel"]
+[node name="Button_Model_Up" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/Renderer/PixelCanvas/ModelControlButtonPanel"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -1225,11 +1090,11 @@ icon = ExtResource("7_klpv1")
 icon_alignment = 1
 expand_icon = true
 
-[node name="Button_Model_Up_Left_Empty" type="AspectRatioContainer" parent="MainUI/HBoxContainer/HSplitContainer/Renderer/Renderer/PixelCanvas/ModelControlButtonPanel"]
+[node name="Button_Model_Up_Left_Empty" type="AspectRatioContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/Renderer/PixelCanvas/ModelControlButtonPanel"]
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 
-[node name="Button_Model_Left" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/Renderer/Renderer/PixelCanvas/ModelControlButtonPanel"]
+[node name="Button_Model_Left" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/Renderer/PixelCanvas/ModelControlButtonPanel"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -1237,7 +1102,7 @@ icon = ExtResource("9_lbuph")
 icon_alignment = 1
 expand_icon = true
 
-[node name="Button_Model_Down" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/Renderer/Renderer/PixelCanvas/ModelControlButtonPanel"]
+[node name="Button_Model_Down" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/Renderer/PixelCanvas/ModelControlButtonPanel"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -1245,7 +1110,7 @@ icon = ExtResource("8_75uvr")
 icon_alignment = 1
 expand_icon = true
 
-[node name="Button_Model_Right" type="Button" parent="MainUI/HBoxContainer/HSplitContainer/Renderer/Renderer/PixelCanvas/ModelControlButtonPanel"]
+[node name="Button_Model_Right" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/Renderer/PixelCanvas/ModelControlButtonPanel"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -1253,7 +1118,7 @@ icon = ExtResource("10_3lf5q")
 icon_alignment = 1
 expand_icon = true
 
-[node name="CanvasSizeLabel" type="Label" parent="MainUI/HBoxContainer/HSplitContainer/Renderer"]
+[node name="CanvasSizeLabel" type="Label" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.479183, 0.479183, 0.479183, 1)
@@ -1261,32 +1126,53 @@ theme_override_font_sizes/font_size = 16
 text = "Canvas size: 512 px"
 horizontal_alignment = 2
 
-[node name="Console" type="HBoxContainer" parent="MainUI/HBoxContainer/HSplitContainer/Renderer"]
+[node name="TabContainer" type="TabContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer"]
+layout_mode = 2
+size_flags_vertical = 3
+current_tab = 1
+
+[node name="Console" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/TabContainer"]
+visible = false
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 10
+metadata/_tab_index = 0
 
-[node name="Console" type="TextEdit" parent="MainUI/HBoxContainer/HSplitContainer/Renderer/Console"]
+[node name="Console" type="RichTextLabel" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/TabContainer/Console"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 16
-editable = false
-context_menu_enabled = false
-emoji_menu_enabled = false
-shortcut_keys_enabled = false
-selecting_enabled = false
+focus_mode = 2
+theme_override_font_sizes/normal_font_size = 21
+selection_enabled = true
 deselect_on_focus_loss_enabled = false
 drag_and_drop_selection_enabled = false
-virtual_keyboard_enabled = false
-middle_mouse_paste_enabled = false
-empty_selection_clipboard_enabled = false
-wrap_mode = 1
-indent_wrapped_lines = true
-scroll_smooth = true
 script = ExtResource("28_e8x0m")
 
-[node name="RenderConfigFoldableContainer" type="FoldableContainer" parent="MainUI"]
+[node name="Timeline" type="VBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/TabContainer"]
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/TabContainer/Timeline"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TracksContainer" type="VBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/TabContainer/Timeline/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/TabContainer/Timeline"]
+layout_mode = 2
+alignment = 1
+
+[node name="AddTrackButton" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/TabContainer/Timeline/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Add Track"
+
+[node name="RenderConfigFoldableContainer" type="FoldableContainer" parent="CanvasLayer/MainUI"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -1295,15 +1181,15 @@ title = "Render Config"
 title_position = 1
 title_text_overrun_behavior = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MainUI/RenderConfigFoldableContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer"]
 layout_mode = 2
 
-[node name="UI_Controls" type="VBoxContainer" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer"]
+[node name="UI_Controls" type="VBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -1312,42 +1198,42 @@ text = "PRESET CONFIG"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="PresetSelector" type="HBoxContainer" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PresetSelector" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="PresetOptionButton" type="OptionButton" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PresetSelector"]
+[node name="PresetOptionButton" type="OptionButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PresetSelector"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 clip_text = true
 fit_to_longest_item = false
 
-[node name="SearchTextLineEdit" type="LineEdit" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PresetSelector"]
+[node name="SearchTextLineEdit" type="LineEdit" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PresetSelector"]
 unique_name_in_owner = true
 clip_contents = true
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 placeholder_text = "search "
 
-[node name="SavePresetButton" type="Button" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PresetSelector"]
+[node name="SavePresetButton" type="Button" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PresetSelector"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 icon = ExtResource("22_6vt7t")
 expand_icon = true
 
-[node name="DeletePresetButton" type="Button" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PresetSelector"]
+[node name="DeletePresetButton" type="Button" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PresetSelector"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 icon = ExtResource("23_ilx0h")
 expand_icon = true
 
-[node name="HSeparator7" type="HSeparator" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="HSeparator7" type="HSeparator" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 layout_mode = 2
 
-[node name="Label4" type="Label" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="Label4" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -1356,48 +1242,48 @@ text = "COLOR ADJUSTMENTS"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="Panel" type="Panel" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="Panel" type="Panel" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 layout_mode = 2
 
-[node name="PixelAdjust1" type="HBoxContainer" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust1" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust1"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust1"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Color steps:"
 horizontal_alignment = 2
 
-[node name="ColorStepsSpin" type="SpinBox" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust1"]
+[node name="ColorStepsSpin" type="SpinBox" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust1"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4
 value = 8.0
 allow_greater = true
 
-[node name="Label2" type="Label" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust1"]
+[node name="Label2" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust1"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ResetMaterialButton" type="Button" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust1"]
+[node name="ResetMaterialButton" type="Button" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust1"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 icon = ExtResource("9_ilx0h")
 expand_icon = true
 
-[node name="PixelAdjust2" type="HBoxContainer" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust2" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust2"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust2"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Edge strength:"
 horizontal_alignment = 2
 
-[node name="EdgeStrengthSlider" type="HSlider" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust2"]
+[node name="EdgeStrengthSlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust2"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -1406,17 +1292,17 @@ size_flags_vertical = 4
 max_value = 5.0
 step = 0.5
 
-[node name="PixelAdjust3" type="HBoxContainer" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust3" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust3"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust3"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Sharpness:"
 horizontal_alignment = 2
 
-[node name="SharpnessSlider" type="HSlider" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust3"]
+[node name="SharpnessSlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust3"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -1425,17 +1311,17 @@ size_flags_vertical = 4
 max_value = 5.0
 step = 0.1
 
-[node name="PixelAdjust4" type="HBoxContainer" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust4" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust4"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust4"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Hue shift:"
 horizontal_alignment = 2
 
-[node name="HueShiftSlider" type="HSlider" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust4"]
+[node name="HueShiftSlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust4"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -1444,17 +1330,17 @@ size_flags_vertical = 4
 min_value = -180.0
 max_value = 180.0
 
-[node name="PixelAdjust5" type="HBoxContainer" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust5" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust5"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust5"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Saturation:"
 horizontal_alignment = 2
 
-[node name="SaturationSlider" type="HSlider" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust5"]
+[node name="SaturationSlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust5"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -1464,17 +1350,17 @@ max_value = 2.0
 step = 0.1
 value = 1.0
 
-[node name="PixelAdjust6" type="HBoxContainer" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust6" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust6"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust6"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Value:"
 horizontal_alignment = 2
 
-[node name="ValueSlider" type="HSlider" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust6"]
+[node name="ValueSlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust6"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -1484,17 +1370,17 @@ max_value = 2.0
 step = 0.1
 value = 1.0
 
-[node name="PixelAdjust7" type="HBoxContainer" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust7" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust7"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust7"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Contrast:"
 horizontal_alignment = 2
 
-[node name="ContrastSlider" type="HSlider" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust7"]
+[node name="ContrastSlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust7"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -1504,17 +1390,17 @@ max_value = 5.0
 step = 0.1
 value = 1.0
 
-[node name="PixelAdjust8" type="HBoxContainer" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust8" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust8"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust8"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Gamma:"
 horizontal_alignment = 2
 
-[node name="GammaSlider" type="HSlider" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust8"]
+[node name="GammaSlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust8"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -1524,17 +1410,17 @@ max_value = 5.0
 step = 0.1
 value = 1.0
 
-[node name="PixelAdjust9" type="HBoxContainer" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust9" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust9"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust9"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Brightness:"
 horizontal_alignment = 2
 
-[node name="BrightnessSlider" type="HSlider" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust9"]
+[node name="BrightnessSlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust9"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -1544,29 +1430,29 @@ min_value = -1.0
 max_value = 1.0
 step = 0.1
 
-[node name="PixelAdjust10" type="HBoxContainer" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust10" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust10"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust10"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Outline:"
 horizontal_alignment = 2
 
-[node name="OutlineSpinBox" type="SpinBox" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust10"]
+[node name="OutlineSpinBox" type="SpinBox" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust10"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="OutlineColorPicker" type="ColorPickerButton" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust10"]
+[node name="OutlineColorPicker" type="ColorPickerButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust10"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 
-[node name="HSeparator10" type="HSeparator" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="HSeparator10" type="HSeparator" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 layout_mode = 2
 
-[node name="Label2" type="Label" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="Label2" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -1575,17 +1461,17 @@ text = "DITHERING"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="PixelAdjust12" type="HBoxContainer" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust12" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust12"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust12"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Amount:"
 horizontal_alignment = 2
 
-[node name="DitherAmountSlider" type="HSlider" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust12"]
+[node name="DitherAmountSlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust12"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -1593,17 +1479,17 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 step = 0.01
 
-[node name="PixelAdjust13" type="HBoxContainer" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust13" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust13"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust13"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Blend:"
 horizontal_alignment = 2
 
-[node name="DitherBlendSlider" type="HSlider" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust13"]
+[node name="DitherBlendSlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust13"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -1611,17 +1497,17 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 step = 0.01
 
-[node name="PixelAdjust14" type="HBoxContainer" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust14" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust14"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust14"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Threshold:"
 horizontal_alignment = 2
 
-[node name="DitherThresholdSlider" type="HSlider" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust14"]
+[node name="DitherThresholdSlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust14"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -1629,53 +1515,53 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 step = 0.01
 
-[node name="PixelAdjust15" type="HBoxContainer" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust15" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust15"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust15"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Sensitivity:"
 horizontal_alignment = 2
 
-[node name="DitherSensitivitySlider" type="HSlider" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust15"]
+[node name="DitherSensitivitySlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust15"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="PixelAdjust16" type="HBoxContainer" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust16" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust16"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust16"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Dot size"
 horizontal_alignment = 2
 
-[node name="DitherDotSizeSpin" type="SpinBox" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust16"]
+[node name="DitherDotSizeSpin" type="SpinBox" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust16"]
 unique_name_in_owner = true
 layout_mode = 2
 step = 0.1
 value = 1.0
 
-[node name="DitherDotColor" type="ColorPickerButton" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust16"]
+[node name="DitherDotColor" type="ColorPickerButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust16"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 
-[node name="HSeparator9" type="HSeparator" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="HSeparator9" type="HSeparator" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 layout_mode = 2
 
-[node name="Panel2" type="Panel" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="Panel2" type="Panel" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_x1hdl")
 
-[node name="TextureRect" type="TextureRect" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/Panel2"]
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/Panel2"]
 clip_contents = true
 layout_mode = 1
 anchors_preset = 15
@@ -1688,11 +1574,11 @@ texture = SubResource("ViewportTexture_6vt7t")
 expand_mode = 1
 stretch_mode = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -1701,7 +1587,7 @@ text = "COLORS"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="UsePaletteCheckButton" type="CheckButton" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="UsePaletteCheckButton" type="CheckButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
@@ -1711,60 +1597,60 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_6vt7t")
 text = " REMAP"
 alignment = 1
 
-[node name="ColorPresetOptionButton" type="OptionButton" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="ColorPresetOptionButton" type="OptionButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 clip_text = true
 fit_to_longest_item = false
 
-[node name="UsePaletteColor1" type="ColorPickerButton" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="UsePaletteColor1" type="ColorPickerButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="UsePaletteColor2" type="ColorPickerButton" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="UsePaletteColor2" type="ColorPickerButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="UsePaletteColor3" type="ColorPickerButton" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="UsePaletteColor3" type="ColorPickerButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="UsePaletteColor4" type="ColorPickerButton" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="UsePaletteColor4" type="ColorPickerButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="UsePaletteColor5" type="ColorPickerButton" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="UsePaletteColor5" type="ColorPickerButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="UsePaletteColor6" type="ColorPickerButton" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="UsePaletteColor6" type="ColorPickerButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="UsePaletteColor7" type="ColorPickerButton" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="UsePaletteColor7" type="ColorPickerButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="UsePaletteColor8" type="ColorPickerButton" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="UsePaletteColor8" type="ColorPickerButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="SampleColorsButton" type="Button" parent="MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="SampleColorsButton" type="Button" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "SAMPLE"
 
-[node name="Panel" type="Panel" parent="MainUI"]
+[node name="Panel" type="Panel" parent="CanvasLayer/MainUI"]
 layout_mode = 2
 
 [node name="ModelsHandler" type="Node3D" parent="."]
@@ -1781,85 +1667,89 @@ unique_name_in_owner = true
 [node name="Skeleton_Minion" parent="ModelsHandler/ModelsSpawner/TempModel" instance=ExtResource("27_wwtbg")]
 
 [node name="Skeleton3D" parent="ModelsHandler/ModelsSpawner/TempModel/Skeleton_Minion/Rig" index="0"]
-bones/1/position = Vector3(0, 0.392064, 0)
-bones/1/rotation = Quaternion(-1.11123e-10, 0.0431578, 2.57241e-09, 0.999068)
-bones/2/rotation = Quaternion(-6.93889e-18, 7.10543e-15, 4.93038e-32, 1)
-bones/3/rotation = Quaternion(8.27181e-25, 3.72529e-09, -2.75506e-40, 1)
-bones/3/scale = Vector3(1, 1, 1)
-bones/4/position = Vector3(0.212007, 0.134132, 7.92996e-08)
-bones/4/rotation = Quaternion(-0.559906, -0.0608803, -0.643974, 0.517779)
-bones/4/scale = Vector3(0.999999, 0.999999, 1)
-bones/5/rotation = Quaternion(3.65498e-08, -4.88301e-08, -0.494719, 0.869053)
-bones/5/scale = Vector3(1, 0.999999, 1)
-bones/6/rotation = Quaternion(1.44633e-08, 1.26672e-08, 0.0266581, 0.999645)
-bones/6/scale = Vector3(1, 1, 1)
-bones/7/rotation = Quaternion(-0.321065, -0.325319, 0.145726, 0.87741)
-bones/7/scale = Vector3(1, 1, 1)
-bones/8/position = Vector3(8.34843e-10, 0.0961252, -0.0575)
-bones/8/rotation = Quaternion(-3.6586e-09, 6.87811e-09, -0.707107, 0.707107)
-bones/8/scale = Vector3(1, 1, 1)
-bones/9/position = Vector3(-0.212007, 0.134132, 8.6814e-08)
-bones/9/rotation = Quaternion(-0.618244, 0.0807287, 0.618012, 0.478873)
-bones/9/scale = Vector3(0.999999, 0.999999, 1)
-bones/10/rotation = Quaternion(2.09853e-08, 5.12855e-08, 0.517939, 0.855417)
-bones/10/scale = Vector3(1, 1, 1)
-bones/11/rotation = Quaternion(-4.94615e-10, -1.45974e-08, -0.0266581, 0.999645)
-bones/11/scale = Vector3(1, 1, 1)
-bones/12/rotation = Quaternion(-0.319291, 0.300524, -0.22735, 0.869512)
-bones/12/scale = Vector3(1, 1, 1)
-bones/13/position = Vector3(-1.5736e-08, 0.0961251, -0.0575)
-bones/13/rotation = Quaternion(-1.02444e-09, -4.24391e-09, 0.707107, 0.707107)
-bones/13/scale = Vector3(1, 1, 1)
-bones/14/rotation = Quaternion(-5.80608e-11, -0.0313417, -1.88012e-09, 0.999509)
-bones/15/position = Vector3(0.170945, 0.113587, 1.59941e-08)
-bones/15/rotation = Quaternion(0.996185, 0.0479136, 0.0566427, -0.045939)
-bones/15/scale = Vector3(1, 1, 1)
-bones/16/rotation = Quaternion(0.165014, 6.49414e-08, -1.11407e-07, 0.986291)
-bones/16/scale = Vector3(1, 1, 1)
-bones/17/rotation = Quaternion(-0.533729, -0.260895, -1.72985e-05, 0.804405)
-bones/17/scale = Vector3(1, 1, 0.999999)
-bones/18/rotation = Quaternion(0.000263472, 0.920216, -0.391412, -5.96391e-05)
-bones/18/scale = Vector3(1, 0.999997, 1)
-bones/19/position = Vector3(-0.170945, 0.113587, 1.55755e-08)
-bones/19/rotation = Quaternion(0.997322, -0.0294574, 0.0315293, 0.0590483)
-bones/19/scale = Vector3(1, 1, 1)
-bones/20/rotation = Quaternion(0.274008, -6.38135e-08, 1.92761e-07, 0.961727)
-bones/20/scale = Vector3(1, 1, 1)
-bones/21/rotation = Quaternion(-0.559039, 0.114513, -0.00862763, 0.82115)
-bones/21/scale = Vector3(1, 1, 0.999999)
-bones/22/rotation = Quaternion(-8.93489e-05, 0.920222, -0.391398, 2.0291e-05)
-bones/22/scale = Vector3(1, 0.999998, 1)
-bones/23/rotation = Quaternion(0.707107, -2.29302e-07, -4.60552e-08, 0.707107)
-bones/24/position = Vector3(0.213918, 0.0259903, 0.173866)
-bones/24/rotation = Quaternion(-0.705092, 0.0533355, 0.0533355, 0.705092)
-bones/25/rotation = Quaternion(9.65792e-09, 1.77955e-09, 0.985719, -0.168398)
-bones/26/position = Vector3(-1.11482e-08, 0.213436, -5.36347e-09)
-bones/26/rotation = Quaternion(-1.10961e-07, 0.391084, 0.920355, -2.67919e-08)
-bones/26/scale = Vector3(1, 1, 1)
-bones/27/position = Vector3(-6.31128e-09, 0.16565, -7.10267e-09)
-bones/27/scale = Vector3(1, 1, 1)
-bones/28/rotation = Quaternion(1, -8.27364e-11, 1.94627e-07, -7.45058e-09)
-bones/28/scale = Vector3(1, 1, 1)
-bones/29/rotation = Quaternion(5.55113e-17, -6.74098e-17, -1.94669e-08, 1)
-bones/30/rotation = Quaternion(0.707107, -3.82385e-08, 1.45009e-07, 0.707107)
-bones/31/rotation = Quaternion(-0.707107, -7.05285e-08, -7.05285e-08, 0.707107)
-bones/32/rotation = Quaternion(-5.83589e-09, 6.43837e-10, 0.994809, 0.101756)
-bones/33/position = Vector3(-1.11482e-08, 0.213436, -2.50942e-15)
-bones/33/rotation = Quaternion(-1.05796e-07, 0.391084, 0.920355, -2.58643e-08)
-bones/33/scale = Vector3(1, 1, 1)
-bones/34/position = Vector3(-6.31128e-09, 0.16565, 2.70695e-09)
-bones/34/rotation = Quaternion(-0.391084, -6.73931e-08, -6.22002e-08, 0.920355)
-bones/34/scale = Vector3(1, 1, 1)
-bones/35/rotation = Quaternion(1, 3.76526e-09, 1.94879e-07, 7.45058e-09)
-bones/35/scale = Vector3(1, 1, 1)
-bones/36/rotation = Quaternion(1.00614e-16, -6.74098e-17, -1.57416e-08, 1)
-bones/36/scale = Vector3(1, 1, 1)
-bones/37/rotation = Quaternion(-0.707107, -7.27951e-08, -7.27951e-08, 0.707107)
-bones/38/position = Vector3(0.520841, 0.788312, -0.0576373)
-bones/38/rotation = Quaternion(0.794627, -1.11759e-07, 0.607098, -5.96046e-08)
-bones/39/rotation = Quaternion(-0.707107, -7.27951e-08, -7.27951e-08, 0.707107)
-bones/40/position = Vector3(-0.510844, 0.788312, 0.0597369)
-bones/40/rotation = Quaternion(-0.758253, -1.52737e-07, 0.651961, -1.11759e-08)
+bones/1/position = Vector3(0, 0.39206383, 0)
+bones/1/rotation = Quaternion(-1.11122625e-10, 0.043157753, 2.5724098e-09, 0.9990683)
+bones/1/scale = Vector3(0.99999994, 1, 0.99999994)
+bones/2/rotation = Quaternion(-6.938893e-18, 7.1054274e-15, 4.93038e-32, 1)
+bones/2/scale = Vector3(1.0000001, 1, 1.0000001)
+bones/3/rotation = Quaternion(8.271806e-25, 3.7252903e-09, -2.75506e-40, 1)
+bones/3/scale = Vector3(1, 0.9999999, 1)
+bones/4/position = Vector3(0.21200736, 0.13413203, 7.9299625e-08)
+bones/4/rotation = Quaternion(-0.5599063, -0.060880348, -0.6439745, 0.5177794)
+bones/4/scale = Vector3(0.9999991, 0.9999986, 0.9999996)
+bones/5/rotation = Quaternion(3.6549825e-08, -4.8830096e-08, -0.49471933, 0.8690529)
+bones/5/scale = Vector3(1.0000006, 0.99999946, 1)
+bones/6/rotation = Quaternion(1.44633185e-08, 1.2667185e-08, 0.026658092, 0.99964464)
+bones/6/scale = Vector3(0.99999994, 1, 1)
+bones/7/rotation = Quaternion(-0.32106528, -0.32531866, 0.14572594, 0.8774103)
+bones/7/scale = Vector3(0.9999998, 0.99999976, 1.0000004)
+bones/8/position = Vector3(8.348433e-10, 0.096125185, -0.057500035)
+bones/8/rotation = Quaternion(-3.6586003e-09, 6.8781096e-09, -0.7071068, 0.7071067)
+bones/8/scale = Vector3(1, 1.0000001, 1.0000001)
+bones/9/position = Vector3(-0.21200737, 0.13413203, 8.6813984e-08)
+bones/9/rotation = Quaternion(-0.6182439, 0.08072865, 0.61801153, 0.47887278)
+bones/9/scale = Vector3(0.99999905, 0.9999985, 0.9999996)
+bones/10/rotation = Quaternion(2.0985292e-08, 5.128552e-08, 0.5179393, 0.85541743)
+bones/10/scale = Vector3(1.0000008, 0.9999997, 0.9999999)
+bones/11/rotation = Quaternion(-4.94615e-10, -1.4597426e-08, -0.026658095, 0.99964464)
+bones/11/scale = Vector3(1.0000001, 1, 1)
+bones/12/rotation = Quaternion(-0.31929126, 0.30052418, -0.22734973, 0.86951166)
+bones/12/scale = Vector3(0.9999998, 0.9999999, 1.0000002)
+bones/13/position = Vector3(-1.573599e-08, 0.096125126, -0.057499975)
+bones/13/rotation = Quaternion(-1.0244433e-09, -4.24391e-09, 0.7071068, 0.7071067)
+bones/13/scale = Vector3(1, 1.0000001, 1.0000001)
+bones/14/rotation = Quaternion(-5.8060785e-11, -0.031341746, -1.880125e-09, 0.99950874)
+bones/14/scale = Vector3(1, 0.99999994, 1)
+bones/15/position = Vector3(0.17094508, 0.1135872, 1.5994095e-08)
+bones/15/rotation = Quaternion(0.9961855, 0.04791363, 0.05664269, -0.04593895)
+bones/15/scale = Vector3(0.9999998, 0.9999997, 1.000001)
+bones/16/rotation = Quaternion(0.16501395, 6.494141e-08, -1.1140718e-07, 0.9862913)
+bones/16/scale = Vector3(1.0000004, 0.9999998, 0.99999994)
+bones/17/rotation = Quaternion(-0.53372866, -0.26089525, -1.7298482e-05, 0.80440503)
+bones/17/scale = Vector3(0.9999998, 1.0000011, 0.9999993)
+bones/18/rotation = Quaternion(0.00026347244, 0.9202156, -0.39141193, -5.963906e-05)
+bones/18/scale = Vector3(1, 0.9999973, 1.0000023)
+bones/19/position = Vector3(-0.17094508, 0.11358732, 1.557549e-08)
+bones/19/rotation = Quaternion(0.9973222, -0.029457364, 0.03152927, 0.05904832)
+bones/19/scale = Vector3(0.9999999, 0.99999976, 1.0000008)
+bones/20/rotation = Quaternion(0.2740081, -6.381352e-08, 1.9276102e-07, 0.9617275)
+bones/20/scale = Vector3(0.99999994, 0.99999976, 0.99999994)
+bones/21/rotation = Quaternion(-0.5590394, 0.11451276, -0.008627633, 0.82115)
+bones/21/scale = Vector3(0.99999976, 1.0000006, 0.9999992)
+bones/22/rotation = Quaternion(-8.934892e-05, 0.9202217, -0.3913977, 2.0290998e-05)
+bones/22/scale = Vector3(1.0000002, 0.9999979, 1.0000024)
+bones/23/rotation = Quaternion(0.7071068, -2.2930234e-07, -4.6055177e-08, 0.7071068)
+bones/24/position = Vector3(0.21391787, 0.025990263, 0.17386575)
+bones/24/rotation = Quaternion(-0.70509243, 0.05333549, 0.05333548, 0.70509243)
+bones/25/rotation = Quaternion(9.6579225e-09, 1.7795515e-09, 0.98571914, -0.1683977)
+bones/26/position = Vector3(-1.1148217e-08, 0.21343614, -5.3634723e-09)
+bones/26/rotation = Quaternion(-1.1096062e-07, 0.39108434, 0.92035484, -2.6791865e-08)
+bones/26/scale = Vector3(0.99999994, 0.9999999, 0.9999999)
+bones/27/position = Vector3(-6.3112795e-09, 0.16565004, -7.102669e-09)
+bones/27/scale = Vector3(1, 0.99999994, 1)
+bones/28/rotation = Quaternion(1, -8.2736366e-11, 1.9462742e-07, -7.450581e-09)
+bones/28/scale = Vector3(0.99999994, 1, 0.99999994)
+bones/29/rotation = Quaternion(5.551129e-17, -6.740978e-17, -1.9466935e-08, 1)
+bones/30/rotation = Quaternion(0.7071068, -3.823849e-08, 1.4500867e-07, 0.7071068)
+bones/31/rotation = Quaternion(-0.7071068, -7.0528515e-08, -7.05285e-08, 0.7071068)
+bones/32/rotation = Quaternion(-5.8358944e-09, 6.4383693e-10, 0.9948094, 0.10175614)
+bones/33/position = Vector3(-1.114822e-08, 0.21343614, -2.5094192e-15)
+bones/33/rotation = Quaternion(-1.05795515e-07, 0.39108434, 0.92035484, -2.5864264e-08)
+bones/33/scale = Vector3(1.0000001, 1, 0.9999999)
+bones/34/position = Vector3(-6.3112755e-09, 0.16565004, 2.7069498e-09)
+bones/34/rotation = Quaternion(-0.39108434, -6.739311e-08, -6.2200165e-08, 0.92035484)
+bones/34/scale = Vector3(1.0000001, 1, 1)
+bones/35/rotation = Quaternion(1, 3.7652574e-09, 1.9487908e-07, 7.4505815e-09)
+bones/35/scale = Vector3(0.99999994, 1, 0.99999994)
+bones/36/rotation = Quaternion(1.00614094e-16, -6.7409847e-17, -1.574163e-08, 1)
+bones/36/scale = Vector3(1.0000001, 1, 1)
+bones/37/rotation = Quaternion(-0.7071068, -7.279511e-08, -7.279509e-08, 0.7071068)
+bones/38/position = Vector3(0.52084064, 0.78831226, -0.05763735)
+bones/38/rotation = Quaternion(0.7946267, -1.1175871e-07, 0.6070983, -5.9604645e-08)
+bones/39/rotation = Quaternion(-0.7071068, -7.279511e-08, -7.279509e-08, 0.7071068)
+bones/40/position = Vector3(-0.5108437, 0.78831214, 0.059736922)
+bones/40/rotation = Quaternion(-0.7582528, -1.527369e-07, 0.65196073, -1.1175871e-08)
+bones/40/scale = Vector3(1, 1.0000001, 1)
 
 [node name="AnimationPlayer" parent="ModelsHandler/ModelsSpawner/TempModel/Skeleton_Minion" index="1"]
 autoplay = "Idle"

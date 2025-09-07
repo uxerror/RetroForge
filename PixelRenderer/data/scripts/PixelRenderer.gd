@@ -1,5 +1,5 @@
 extends Node3D
-
+class_name PixelRenderer
 
 @onready var export_dir_path: Label = %ExportDirPath
 @onready var select_folder_button: Button = %SelectFolderButton
@@ -7,8 +7,6 @@ extends Node3D
 
 @onready var file_dialog: FileDialog = %FileDialog
 @onready var texture_rect: TextureRect = %PixelCanvas
-
-@onready var fps_spin_box: SpinBox = %FpsSpin
 
 @onready var renderer: PanelContainer = %Renderer
 @onready var models_spawner: Node3D = %ModelsSpawner
@@ -26,20 +24,24 @@ extends Node3D
 @export var end_frame: int = 30
 @export var fps: int = 12
 
-
 @onready var resolution: SpinBox = %Resolution
 @onready var preview_image_check_box: CheckButton = %PreviewImageCheckBox
 @onready var view_mode_dropdown : OptionButton = %ViewModeDropDown
 @onready var canvas_size_label: Label = %CanvasSizeLabel
 @onready var pixel_material_script: Node = $PixelMaterial
+@export var sprite_sheet_check_box: CheckButton
 
-@onready var console: TextEdit = %Console
+@onready var console: Console = %Console
 
-@onready var save_point_grid_container: GridContainer = %SavePointGridContainer
 @onready var models_handler: Node3D = %ModelsHandler
 
 @onready var model_control_button_panel: GridContainer = %ModelControlButtonPanel
 @onready var viewport_background_color_rect: ColorRect = %ViewportBackgroundColorRect
+
+@onready var tracks_container: Node = %TracksContainer
+@onready var model_controller: Node = %ModelsSpawner
+
+var export_tasks: Array = []   # array of dictionaries: { "track": Track, "checkpoint_index": int }
 
 var export_directory: String = ""
 var is_exporting: bool = false
@@ -62,18 +64,22 @@ var original_animation_position: float = 0.0
 var export_frame_list: Array = []
 var export_frame_index: int = 0
 
-var checkpoint_index: int = 0
-var total_checkpoints: int = 0
+var export_task_index: int = 0
+var export_frame_index_in_task: int = 0
+
+# Sprite sheet export variables
+var sprite_sheet_image: Image = null
+var sprite_sheet_width: int = 0
+var sprite_sheet_height: int = 0
+var frames_per_row: int = 0
+
 
 func _ready():
 	# Initialize console
-	_update_progress("EffectBlocks PixelRenderer")
-	_update_progress("Visit https://bukkbeek.itch.io/effectblocks")
-	_update_progress("PixelRenderer initialized successfully")
-	_update_progress("Canvas update timer set to " + str(fps) + " FPS")
-	_update_progress("Base canvas size: " + str(BASE_CANVAS_SIZE) + "x" + str(BASE_CANVAS_SIZE))
-	_update_progress("Default minion skeleton by KayKit: kaylousberg.itch.io/kaykit-skeletons")
-
+	console.log("EffectBlocks PixelRenderer", console.INFO)
+	console.log("Visit https://github.com/uxerror/RetroForge", console.INFO)
+	console.log("PixelRenderer initialized successfully", console.OK)
+	
 	# Keep SubViewport updating continuously so models run at normal speed
 	sub_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	
@@ -87,33 +93,38 @@ func _ready():
 	add_child(canvas_update_timer)
 	canvas_update_timer.start()
 	
+	console.log("Canvas update timer set to " + str(fps) + " FPS", console.INFO)
+	console.log("Base canvas size: " + str(BASE_CANVAS_SIZE) + "x" + str(BASE_CANVAS_SIZE), console.INFO)
+	console.log("Default minion skeleton by KayKit: kaylousberg.itch.io/kaykit-skeletons", console.INFO)
+	
 	# Connect signals
 	export_button.pressed.connect(_on_export_button_pressed)
 	select_folder_button.pressed.connect(_on_select_folder_button_pressed)
-	fps_spin_box.value_changed.connect(_on_fps_changed)
 	resolution.value_changed.connect(_on_resolution_changed)
 	file_dialog.dir_selected.connect(_on_directory_selected)
 	bg_color_check_box.toggled.connect(_on_bg_color_toggled)
 	bg_color_picker.color_changed.connect(_on_bg_color_changed)
+	if tracks_container:
+		tracks_container.child_entered_tree.connect(_on_track_added)
+
 	
 	# Setup View Modes
 	_setup_view_mode_dropdown()
 	view_mode_dropdown.item_selected.connect(_view_mode_item_selected)
 	
 	# Connect to ViewMaterials signal for automatic color remap toggle
-	get_node("ViewMaterials").technical_mode_selected.connect(_on_technical_mode_selected)
-	
-	models_handler.added_checkpoint.connect(add_save_point_button)
+	var view_materials = get_node_or_null("ViewMaterials")
+	if view_materials and view_materials.has_signal("technical_mode_selected"):
+		view_materials.technical_mode_selected.connect(_on_technical_mode_selected)
 	
 	# Set up file dialog
 	file_dialog.file_mode = FileDialog.FILE_MODE_OPEN_DIR
 	file_dialog.access = FileDialog.ACCESS_FILESYSTEM
 	
-	# Initialize FPS spin box
-	fps_spin_box.value = fps
-	fps_spin_box.min_value = 1
-	fps_spin_box.max_value = 120
-	fps_spin_box.step = 1
+	# Connect to track signals
+	if tracks_container:
+		for track in tracks_container.get_children():
+			_connect_track_signals(track)
 	
 	# Initialize resolution spin box
 	resolution.value = 512
@@ -132,25 +143,29 @@ func _ready():
 	# Initialize progress bar
 	progress_bar.min_value = 0
 	progress_bar.max_value = 100
-	
 
-func _on_fps_changed(value: float):
-	fps = int(value)
-	# Update the canvas update timer instead of engine FPS
-	canvas_update_timer.wait_time = 1.0 / fps
-	canvas_update_timer.start()  # Restart the timer with new interval
-	_update_progress("FPS changed to " + str(fps))
+func _connect_track_signals(track: Track):
+	if track.has_signal("request_create_checkpoint"):
+		track.request_create_checkpoint.connect(_on_track_request_create_checkpoint)
+	if track.has_signal("request_become_active"):
+		track.request_become_active.connect(_on_track_request_become_active)
+	track.models_handler = models_handler
+
+func _on_track_added(track: Node) -> void:
+	if track is Track:
+		_connect_track_signals(track)
+		console.log("Track added and signals connected", console.OK)
 
 func _on_resolution_changed(value: float):
 	_update_canvas_size_label()
-	_update_progress("Export resolution changed to " + str(int(value)) + "x" + str(int(value)))
+	console.log("Export resolution changed to " + str(int(value)) + "x" + str(int(value)), console.INFO)
 
 func _on_export_button_pressed():
 	if is_exporting:
 		return
 	
 	if export_directory == "":
-		_update_progress("No export directory selected, opening folder dialog...")
+		console.log("No export directory selected, opening folder dialog...", console.WARN)
 		_on_select_folder_button_pressed()
 		return
 		
@@ -163,13 +178,12 @@ func _on_select_folder_button_pressed():
 
 func _on_directory_selected(dir: String):
 	export_directory = dir
-	_update_progress("Export directory set to: " + export_directory)
+	console.log("Export directory set to: " + export_directory, console.INFO)
 	
 	# Update the label to show the selected path
 	_update_export_path_label()
 
 func _find_animation_player(node: Node) -> AnimationPlayer:
-	# Check if current node is an AnimationPlayer
 	if node is AnimationPlayer:
 		return node as AnimationPlayer
 	
@@ -182,190 +196,218 @@ func _find_animation_player(node: Node) -> AnimationPlayer:
 	return null
 
 func _start_export():
+	if is_exporting:
+		return
+	if export_directory == "":
+		console.log("No export directory selected, opening folder dialog...", console.WARN)
+		_on_select_folder_button_pressed()
+		return
+	
+	# Stop all tracks before export
+	if tracks_container:
+		for track in tracks_container.get_children():
+			if track is Track:
+				track.set_active(false)
+
+	# track + checkpoint
+	export_tasks = _collect_export_tasks()
+	if export_tasks.size() == 0:
+		console.log("No export tasks collected — aborting.", console.WARN)
+		return
+	
 	model_control_button_panel.hide()
 	viewport_background_color_rect.hide()
-	total_checkpoints = models_handler.checkpoints.size()
 	
-	if total_checkpoints == 0:
-		_update_progress("No checkpoints found, exporting current state only")
-		total_checkpoints = 1
-	
-	if export_directory == "":
-		_update_progress("No export directory selected")
-		return
-		
-	# Получаем диапазон кадров
-	var actual_start_frame = start_frame
-	var actual_end_frame = end_frame
-	
-	checkpoint_index = 0
-	
-	if models_spawner:
-		if models_spawner.has_method("get") and models_spawner.get("start_spin") != null and models_spawner.get("end_spin") != null:
-			actual_start_frame = int(models_spawner.start_spin.value)
-			actual_end_frame = int(models_spawner.end_spin.value)
-			_update_progress("Using frame range from UI: " + str(actual_start_frame) + " to " + str(actual_end_frame))
-		else:
-			_update_progress("Could not access frame range UI controls, using default values")
-	
-	if actual_start_frame >= actual_end_frame:
-		_update_progress("Invalid frame range: start_frame must be less than end_frame")
-		return
-	
-	# FPS skip
-	var frame_skip = int(30.0 / float(fps))
-	if frame_skip < 1:
-		frame_skip = 1
-	
-	_update_progress("Export FPS: " + str(fps) + " (will render every " + str(frame_skip) + " frame(s) from 30 FPS baseline)")
-	
-	if models_spawner:
-		var loaded_model = models_spawner.get_loaded_model()
-		if loaded_model:
-			animation_player = _find_animation_player(loaded_model)
-			if animation_player:
-				was_playing_before_export = animation_player.is_playing()
-				original_animation_position = animation_player.current_animation_position
-				if not animation_player.is_playing():
-					animation_player.play()
-					_update_progress("Started animation playback for export")
-	
+	total_frames = 0
+	for task in export_tasks:
+		var track: Track = task["track"]
+		var settings = track.get_export_settings()
+		var frames = []
+
+		var frame_skip = int(30.0 / float(settings["fps"]))
+		if frame_skip < 1:
+			frame_skip = 1
+
+		for frame_num in range(settings["start_frame"], settings["end_frame"] + 1):
+			if (frame_num - settings["start_frame"]) % frame_skip == 0:
+				frames.append(frame_num)
+
+		task["frames"] = frames
+		total_frames += frames.size()
+
+	console.log("Collected " + str(export_tasks.size()) + " export tasks (track x checkpoint). Total frames: " + str(total_frames), console.INFO)
+
+	# Sprite sheet init
+	if sprite_sheet_check_box.button_pressed:
+		var max_frames = 0
+		for task in export_tasks:
+			max_frames = max(max_frames, task["frames"].size())
+
+		var frame_size = int(resolution.value)
+		frames_per_row = max_frames
+		sprite_sheet_width = frames_per_row * frame_size
+		sprite_sheet_height = export_tasks.size() * frame_size
+		sprite_sheet_image = Image.create(sprite_sheet_width, sprite_sheet_height, false, Image.FORMAT_RGBA8)
+		sprite_sheet_image.fill(Color(0, 0, 0, 0))
+		console.log("Sprite sheet mode enabled: " + str(sprite_sheet_width) + "x" + str(sprite_sheet_height), console.INFO)
+
 	is_exporting = true
-	current_export_frame = actual_start_frame
-	start_frame = actual_start_frame
-	end_frame = actual_end_frame
-	
-	var frames_to_export = []
-	for frame_num in range(start_frame, end_frame + 1):
-		if (frame_num - start_frame) % frame_skip == 0:
-			frames_to_export.append(frame_num)
-	
-	total_frames = frames_to_export.size()
-	
 	export_button.text = "Exporting..."
 	export_button.disabled = true
 	progress_bar.value = 0
-	
-	_update_progress("Starting export from frame " + str(start_frame) + " to " + str(end_frame))
-	_update_progress("Total frames to export: " + str(total_frames))
-	
-	export_frame_list = frames_to_export
-	export_frame_index = 0
+	export_task_index = 0
+	export_frame_index_in_task = 0
+
+	if animation_player:
+		was_playing_before_export = animation_player.is_playing()
+		original_animation_position = animation_player.current_animation_position
 	
 	_export_next_frame()
+
+
+func _collect_export_tasks() -> Array:
+	var tasks := []
+	
+	# Check if we have active tracks
+	var has_active_tracks = false
+	if tracks_container:
+		for track in tracks_container.get_children():
+			if track.has_method("is_active") and track.is_active():
+				has_active_tracks = true
+				break
+	
+	# Collect tasks from tracks
+	if tracks_container:
+		for track in tracks_container.get_children():
+			if track.has_method("get_checkpoint_indices") and track.has_method("get_selected_animation_name"):
+				# If we have active tracks, only export active ones
+				if has_active_tracks and not track.is_active():
+					continue
+					
+				var checkpoint_indices = track.get_checkpoint_indices()
+				for cp_index in checkpoint_indices:
+					tasks.append({"track": track, "checkpoint_index": cp_index})
+	
+	if tasks.size() == 0:
+		console.log("No track checkpoints found — nothing to export.", console.WARN)
+	return tasks
 
 func _export_next_frame():
-	if export_frame_index >= export_frame_list.size():
-		checkpoint_index += 1
-		if checkpoint_index < total_checkpoints:
-			_prepare_checkpoint()
-			export_frame_index = 0
-			_export_next_frame()
-		else:
-			_finish_export()
+	if export_task_index >= export_tasks.size():
+		_finish_export()
 		return
-	
-	# Get the actual frame number to render
-	var frame_to_render = export_frame_list[export_frame_index]
-	
-	# Update progress bar
-	var progress_percent = float(export_frame_index) / float(total_frames) * 100.0
+
+	var task = export_tasks[export_task_index]
+	var track = task["track"]
+	var cp_index = task["checkpoint_index"]
+	var frames = task["frames"]
+
+	if export_frame_index_in_task >= frames.size():
+		export_task_index += 1
+		export_frame_index_in_task = 0
+		_export_next_frame()
+		return
+
+	var frame_to_render = frames[export_frame_index_in_task]
+	var current_global_frame = export_task_index * export_frame_list.size() + export_frame_index_in_task
+	var progress_percent = float(current_global_frame) / float(max(1, total_frames)) * 100.0
 	progress_bar.value = progress_percent
+
+	console.log(
+		"Task %d/%d | Checkpoint %d | frame %d" % [
+		export_task_index + 1,
+		export_tasks.size(),
+		cp_index + 1,
+		frame_to_render
+	],
+	console.INFO)
+
+	if models_handler != null and models_handler.has_method("set_state"):
+		if cp_index >= 0 and cp_index < models_handler.checkpoints.size():
+			models_handler.set_state(models_handler.checkpoints[cp_index])
+			console.log("Applied checkpoint %d" % (cp_index + 1), console.INFO)
+		else:
+			console.log("WARNING: checkpoint index invalid", console.WARN)
+
+	var loaded_model = null
+	if models_spawner and models_spawner.has_method("get_loaded_model"):
+		loaded_model = models_spawner.get_loaded_model()
+	elif models_spawner and models_spawner.has_node("TempModel"):
+		loaded_model = models_spawner.get_node("TempModel")
 	
-	_update_progress("Processing frame " + str(frame_to_render) + " (" + str(export_frame_index + 1) + "/" + str(total_frames) + ")")
-	
-	# If we have an animation player, seek to the correct frame position
-	if animation_player and animation_player.current_animation != "":
-		# Animation timing always uses 30 FPS baseline
-		var target_time = float(frame_to_render) / 30.0
-		
-		# Make sure we don't exceed animation length
-		var animation_length = animation_player.current_animation_length
-		if target_time > animation_length:
-			target_time = animation_length
-		
-		# Seek to the exact frame position
-		animation_player.seek(target_time)
-		_update_progress("Animation seeked to time: " + str(target_time) + "s (frame " + str(frame_to_render) + " at 30 FPS baseline)")
-	
-	# Wait for multiple frames to ensure proper rendering and animation update
+	if loaded_model:
+		animation_player = _find_animation_player(loaded_model)
+	else:
+		animation_player = null
+
+	var anim_name = ""
+	if track and track.has_method("get_selected_animation_name"):
+		anim_name = track.get_selected_animation_name()
+
+	if animation_player != null and anim_name != "":
+		if animation_player.has_animation(anim_name):
+			var target_time = float(frame_to_render) / 30.0
+			var animation_length = animation_player.get_animation(anim_name).length
+			if target_time > animation_length:
+				target_time = animation_length
+			
+			animation_player.play(anim_name)
+			animation_player.seek(target_time, true)
+			console.log("Animation set to '%s' at %.3fs" % [anim_name, target_time], console.INFO)
+		else:
+			console.log("WARNING: Animation '%s' not found in AnimationPlayer" % anim_name, console.WARN)
+	else:
+		console.log("No AnimationPlayer or empty anim_name", console.WARN)
+
 	await get_tree().process_frame
 	await get_tree().process_frame
 	await get_tree().process_frame
-	
-	# Capture the entire Renderer control node and its contents
+
 	var image = await _capture_control_node()
-	
 	if image:
-		# Apply resolution scaling if not in preview mode
 		if not preview_image_check_box.button_pressed:
 			image = _scale_image_nearest_neighbor(image, int(resolution.value))
-		
-		# Get prefix from UI, default to "frame" if empty
-		var prefix = prefix_text.text.strip_edges()
-		if prefix.is_empty():
-			prefix = "frame"
-		
-		# Use actual frame numbers for exported files (Blender style)
-		var filename = "%s_cp%02d_%04d.png" % [prefix, checkpoint_index + 1, frame_to_render]
-		var filepath = export_directory.path_join(filename)
-		
-		_update_progress("Saving frame to: " + filepath)
-		
-		# Save the image
-		var error = image.save_png(filepath)
-		if error != OK:
-			_update_progress("ERROR: Failed to save frame " + str(frame_to_render) + " - Error code: " + str(error))
+
+		if sprite_sheet_check_box.button_pressed:
+			var frame_size = int(resolution.value)
+			var row = export_task_index
+			var col = export_frame_index_in_task
+			var dest_x = col * frame_size
+			var dest_y = row * frame_size
+			sprite_sheet_image.blit_rect(image, Rect2i(Vector2i(0,0), Vector2i(frame_size, frame_size)), Vector2i(dest_x, dest_y))
 		else:
-			var size_info = ""
-			if preview_image_check_box.button_pressed:
-				size_info = " (preview size: " + str(image.get_width()) + "x" + str(image.get_height()) + ")"
+			var prefix = prefix_text.text.strip_edges()
+			if prefix.is_empty():
+				prefix = "frame"
+			var track_label = "track"
+			if track and track.has_method("get_selected_animation_name"):
+				track_label = "track_" + str(track.get_selected_animation_name())
+			var filename = "%s_%s_cp%02d_%04d.png" % [prefix, track_label, cp_index + 1, frame_to_render]
+			var filepath = export_directory.path_join(filename)
+			var err = image.save_png(filepath)
+			if err != OK:
+				console.log("ERROR: failed to save " + filepath + " code: " + str(err), console.WARN)
 			else:
-				size_info = " (scaled to: " + str(image.get_width()) + "x" + str(image.get_height()) + ")"
-			_update_progress("✓ Exported frame " + str(frame_to_render) + " as " + filename + " (" + str(export_frame_index + 1) + "/" + str(total_frames) + ")" + size_info)
+				console.log("Saved: " + filepath, console.INFO)
 	else:
-		_update_progress("ERROR: Failed to capture frame " + str(frame_to_render))
-	
-	export_frame_index += 1
-	
-	# Continue with next frame
-	_prepare_checkpoint()
+		console.log("ERROR: capture failed for frame " + str(frame_to_render))
+
+	export_frame_index_in_task += 1
 	_export_next_frame()
 
-func _prepare_checkpoint():
-	if models_handler.checkpoints.size() == 0:
-		return
-	
-	if checkpoint_index < total_checkpoints:
-		var state = models_handler.checkpoints[checkpoint_index]
-		models_handler.set_state(state)
-		_update_progress("Checkpoint " + str(checkpoint_index + 1) + "/" + str(total_checkpoints) + " applied")
-		
-		animation_player = null
-		if models_spawner:
-			var loaded_model = models_spawner.get_loaded_model()
-			if loaded_model:
-				animation_player = _find_animation_player(loaded_model)
-				if animation_player:
-					_update_progress("Found AnimationPlayer for checkpoint " + str(checkpoint_index + 1))
-					if not animation_player.is_playing():
-						animation_player.play()
-						_update_progress("Started animation playback for checkpoint " + str(checkpoint_index + 1))
-				else:
-					_update_progress("No AnimationPlayer found for checkpoint " + str(checkpoint_index + 1))
 
 func _capture_control_node() -> Image:
 	if not renderer:
-		_update_progress("ERROR: Renderer control node is null")
+		console.log("ERROR: Renderer control node is null")
 		return null
 	
 	# Get the size of the control node
 	var size = renderer.size
 	if size.x <= 0 or size.y <= 0:
-		_update_progress("ERROR: Renderer control node has invalid size: " + str(size))
+		console.log("ERROR: Renderer control node has invalid size: " + str(size))
 		return null
 	
-	_update_progress("Capturing frame at size: " + str(size))
+	console.log("Capturing frame at size: " + str(size))
 	
 	# Create a SubViewport to render the control
 	var capture_viewport = SubViewport.new()
@@ -390,7 +432,7 @@ func _capture_control_node() -> Image:
 	# Get the rendered image with proper alpha channel
 	var viewport_texture = capture_viewport.get_texture()
 	if not viewport_texture:
-		_update_progress("ERROR: Could not get texture from SubViewport")
+		console.log("ERROR: Could not get texture from SubViewport")
 		# Clean up before returning
 		capture_viewport.remove_child(renderer_clone)
 		renderer_clone.queue_free()
@@ -407,15 +449,15 @@ func _capture_control_node() -> Image:
 	capture_viewport.queue_free()
 	
 	if not image:
-		_update_progress("ERROR: Could not capture image from SubViewport")
+		console.log("ERROR: Could not capture image from SubViewport")
 		return null
 	
 	# Ensure the image has an alpha channel for transparency
 	if image.get_format() != Image.FORMAT_RGBA8:
 		image.convert(Image.FORMAT_RGBA8)
-		_update_progress("Image converted to RGBA8 format")
+		console.log("Image converted to RGBA8 format")
 	
-	_update_progress("Frame captured successfully")
+	console.log("Frame captured successfully")
 	# The image should now preserve the alpha channel from the SubViewport
 	return image
 
@@ -425,7 +467,7 @@ func _scale_image_nearest_neighbor(source_image: Image, target_size: int) -> Ima
 	to preserve pixel art aesthetics
 	"""
 	if not source_image:
-		_update_progress("ERROR: Source image is null for scaling")
+		console.log("ERROR: Source image is null for scaling")
 		return null
 	
 	var source_width = source_image.get_width()
@@ -433,10 +475,10 @@ func _scale_image_nearest_neighbor(source_image: Image, target_size: int) -> Ima
 	
 	# If already the target size, return as-is
 	if source_width == target_size and source_height == target_size:
-		_update_progress("Image already at target size (" + str(target_size) + "x" + str(target_size) + ")")
+		console.log("Image already at target size (" + str(target_size) + "x" + str(target_size) + ")")
 		return source_image
 	
-	_update_progress("Scaling image from " + str(source_width) + "x" + str(source_height) + " to " + str(target_size) + "x" + str(target_size))
+	console.log("Scaling image from " + str(source_width) + "x" + str(source_height) + " to " + str(target_size) + "x" + str(target_size))
 	
 	# Create a new image with the target size
 	var scaled_image = Image.create(target_size, target_size, false, Image.FORMAT_RGBA8)
@@ -460,7 +502,7 @@ func _scale_image_nearest_neighbor(source_image: Image, target_size: int) -> Ima
 			var pixel_color = source_image.get_pixel(source_x, source_y)
 			scaled_image.set_pixel(x, y, pixel_color)
 	
-	_update_progress("Image scaling completed")
+	console.log("Image scaling completed")
 	return scaled_image
 
 func _finish_export():
@@ -471,52 +513,51 @@ func _finish_export():
 	# Restore animation player state
 	if animation_player:
 		if was_playing_before_export:
-			# Restore to original position and continue playing
 			animation_player.seek(original_animation_position)
 			if not animation_player.is_playing():
 				animation_player.play()
-			_update_progress("Animation restored to original state")
+			console.log("Animation restored to original state")
 		else:
-			# Stop animation if it wasn't playing before
 			animation_player.stop()
 			animation_player.seek(original_animation_position)
-			_update_progress("Animation stopped and restored to original position")
-	
-	# Complete the progress bar
-	progress_bar.value = 100
+			console.log("Animation stopped and restored to original position")
+			
 	model_control_button_panel.show()
 	viewport_background_color_rect.show()
 	
-	_update_progress("------------------------------")
-	_update_progress("EXPORT COMPLETED!")
-	_update_progress("Total frames exported: " + str(total_frames))
-	_update_progress("Export location: " + export_directory)
-	_update_progress("Frame rate: " + str(fps) + " FPS")
-	if animation_player:
-		_update_progress("Animation was synchronized during export")
-	_update_progress("------------------------------")
+	# if sprite sheet
+	if sprite_sheet_check_box.button_pressed and sprite_sheet_image:
+		var prefix = prefix_text.text.strip_edges()
+		if prefix.is_empty():
+			prefix = "sprite_sheet"
+		var filepath = export_directory.path_join(prefix + "_tileset.png")
+		var err = sprite_sheet_image.save_png(filepath)
+		if err != OK:
+			console.log("ERROR: failed to save sprite sheet " + filepath)
+		else:
+			console.log("Sprite sheet saved: " + filepath)
+
+	# Complete the progress bar
+	progress_bar.value = 100
 	
-	# Optional: Show a completion message
+	console.log("------------------------------")
+	console.log("EXPORT COMPLETED!")
+	console.log("Total frames exported: " + str(total_frames))
+	console.log("Export location: " + export_directory)
+	console.log("Frame rate: " + str(fps) + " FPS")
+	if sprite_sheet_check_box.button_pressed:
+		console.log("Export mode: SPRITE SHEET")
+	else:
+		console.log("Export mode: FRAME SEQUENCE")
+	console.log("------------------------------")
+	
 	_show_completion_message(total_frames)
+
 
 func _show_completion_message(frame_count: int):
 	# You can implement a popup or notification here
-	_update_progress("Animation export finished: " + str(frame_count) + " frames at " + str(fps) + " FPS")
-	_update_progress("You can now create animations or GIFs from the exported frames")
-	# Example: OS.shell_open(export_directory) # Opens the export folder
-
-func _update_progress(message: String):
-	# Update the console TextEdit with the message
-	console.text += message + "\n"
-	# Scroll to the bottom to show the latest message
-	console.scroll_vertical = console.get_line_count()
-
-
-# Optional: Method to set frame range programmatically
-func set_frame_range(start: int, end: int):
-	start_frame = start
-	end_frame = end
-	_update_progress("Frame range set to: " + str(start) + " - " + str(end) + " (total: " + str(end - start + 1) + " frames)")
+	console.log("Animation export finished: " + str(frame_count) + " frames at " + str(fps) + " FPS")
+	console.log("You can now create animations or GIFs from the exported frames")
 
 func _update_canvas():
 	# Capture the current frame from the SubViewport
@@ -529,9 +570,9 @@ func _update_canvas():
 			# Apply the cached texture to the display
 			texture_rect.texture = cached_texture
 		else:
-			_update_progress("WARNING: Could not get image from SubViewport for canvas update")
+			console.log("Could not get image from SubViewport for canvas update", console.WARN)
 	else:
-		_update_progress("WARNING: Could not get texture from SubViewport for canvas update")
+		console.log("Could not get texture from SubViewport for canvas update", console.WARN)
 
 func _update_export_path_label():
 	if export_directory == "":
@@ -556,36 +597,17 @@ func _update_canvas_size_label():
 func _on_bg_color_toggled(button_pressed: bool):
 	_update_bg_color_visibility()
 	if button_pressed:
-		_update_progress("Background color enabled")
+		console.log("Background color enabled")
 	else:
-		_update_progress("Background color disabled")
+		console.log("Background color disabled")
 
 func _on_bg_color_changed(color: Color):
 	bg_color_rect.color = color
-	_update_progress("Background color changed to: " + str(color))
+	console.log("Background color changed to: " + str(color))
 
 func _update_bg_color_visibility():
 	var should_be_visible = bg_color_check_box.button_pressed
 	bg_color_rect.visible = should_be_visible
-
-
-func _view_mode_item_selected(index : int):
-	get_node("ViewMaterials").item_selected(index)
-	var selection : String = view_mode_dropdown.get_item_text(index)
-	_update_progress("Switching View Mode To " + selection)
-
-func _on_technical_mode_selected(mode_name: String):
-	# Automatically turn off color remap when technical modes are selected
-	_turn_off_color_remap_if_enabled()
-	_update_progress("Technical mode '" + mode_name + "' selected - color remap automatically disabled")
-
-func _turn_off_color_remap_if_enabled():
-	# Check if color remap is currently enabled and turn it ofadd_save_point_buttonf
-	if pixel_material_script and pixel_material_script.use_palette_check_box.button_pressed:
-		pixel_material_script.use_palette_check_box.button_pressed = false
-		# Trigger the toggled signal to update the shader parameter
-		pixel_material_script._on_use_palette_toggled(false)
-		_update_progress("Color remap automatically turned off for technical view mode")
 
 func _setup_view_mode_dropdown():
 	view_mode_dropdown.clear()
@@ -594,13 +616,52 @@ func _setup_view_mode_dropdown():
 	view_mode_dropdown.add_item("Normal")
 	view_mode_dropdown.add_item("Specular")
 
-func add_save_point_button(index: int):
-	var btn := Button.new()
-	btn.text = "Checkpoint " + str(index + 1)
-	btn.pressed.connect(func():
-		if index < models_handler.checkpoints.size():
-			var state = models_handler.checkpoints[index]
-			models_handler.set_state(state)
-			_update_progress("Checkpoint " + str(index + 1) + " loaded")
-	)
-	save_point_grid_container.add_child(btn)
+func _view_mode_item_selected(index : int):
+	var view_materials = get_node_or_null("ViewMaterials")
+	if view_materials and view_materials.has_method("item_selected"):
+		view_materials.item_selected(index)
+	var selection : String = view_mode_dropdown.get_item_text(index)
+	console.log("Switching View Mode To " + selection)
+
+func _on_technical_mode_selected(mode_name: String):
+	# Automatically turn off color remap when technical modes are selected
+	_turn_off_color_remap_if_enabled()
+	console.log("Technical mode '" + mode_name + "' selected - color remap automatically disabled")
+
+func _turn_off_color_remap_if_enabled():
+	# Check if color remap is currently enabled and turn it off
+	if pixel_material_script and pixel_material_script.has_method("_on_use_palette_toggled"):
+		if pixel_material_script.use_palette_check_box.button_pressed:
+			pixel_material_script.use_palette_check_box.button_pressed = false
+			# Trigger the toggled signal to update the shader parameter
+			pixel_material_script._on_use_palette_toggled(false)
+			console.log("Color remap automatically turned off for technical view mode")
+
+func _on_track_request_create_checkpoint(track):
+	console.log("Track requested checkpoint creation")
+	var new_index := -1
+	# Try to call create_checkpoint or add_checkpoint in models_handler
+	if models_handler != null:
+		if models_handler.has_method("create_checkpoint"):
+			new_index = models_handler.create_checkpoint()
+		elif models_handler.has_method("add_checkpoint"):
+			new_index = models_handler.add_checkpoint()
+		else:
+			console.log("models_handler doesn't have checkpoint creation method", console.ERROR)
+	else:
+		console.log("models_handler not found - cannot create checkpoint", console.ERROR)
+
+	if new_index >= 0:
+		# Bind the index to the specific track
+		if track and track.has_method("on_checkpoint_created"):
+			track.on_checkpoint_created(new_index)
+		console.log("Checkpoint " + str(new_index + 1) + " created and assigned to track")
+	else:
+		console.log("could not obtain created checkpoint index", console.ERROR)
+
+func _on_track_request_become_active(track):
+	# Reset activity for all tracks and set for this one
+	if tracks_container:
+		for t: Track in tracks_container.get_children():
+			if t.has_method("set_active"):
+				t.set_active(t == track)
