@@ -88,7 +88,7 @@ Independently maintained for Godot 4.5+ users.
 
 1. **Load Model**: Select a GLB/GLTF/FBX file
 2. **Adjust Effects**: Pixelation, colors, shaders
-3. **Set Camera**: Position, rotation, and preset view
+3. **Set Camera**: Position, rotation, and choose a preset view
 4. **Save Checkpoint(s)**: Store model/camera states
 5. **Export**: All checkpoints and tracks are exported with unique filenames or as a sprite sheet
 
