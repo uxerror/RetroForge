@@ -8,22 +8,29 @@
 [ext_resource type="Texture2D" uid="uid://dnwx3aaw136ru" path="res://PixelRenderer/data/icons/reset.png" id="5_yxxfn"]
 [ext_resource type="Texture2D" uid="uid://bikn1l8rdwp5w" path="res://PixelRenderer/data/icons/save_point.png" id="6_68fmn"]
 
-[node name="Track" type="VBoxContainer"]
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="Track" type="HBoxContainer"]
+custom_minimum_size = Vector2(0, 200)
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 165.0
+grow_horizontal = 2
 script = ExtResource("1_61ody")
 
-[node name="HBoxContainer7" type="HBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer7" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
 
-[node name="AnimationSelector" type="OptionButton" parent="HBoxContainer7"]
+[node name="AnimationSelector" type="OptionButton" parent="VBoxContainer/HBoxContainer7"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 clip_text = true
 fit_to_longest_item = false
 
-[node name="AnimPlayButton" type="Button" parent="HBoxContainer7"]
+[node name="AnimPlayButton" type="Button" parent="VBoxContainer/HBoxContainer7"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -32,7 +39,7 @@ icon = ExtResource("1_yhf4e")
 icon_alignment = 1
 expand_icon = true
 
-[node name="AnimPauseButton" type="Button" parent="HBoxContainer7"]
+[node name="AnimPauseButton" type="Button" parent="VBoxContainer/HBoxContainer7"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -41,7 +48,7 @@ icon = ExtResource("2_61ody")
 icon_alignment = 1
 expand_icon = true
 
-[node name="AnimStopButton" type="Button" parent="HBoxContainer7"]
+[node name="AnimStopButton" type="Button" parent="VBoxContainer/HBoxContainer7"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -50,7 +57,7 @@ icon = ExtResource("3_68fmn")
 icon_alignment = 1
 expand_icon = true
 
-[node name="AnimLoopToggleButton" type="Button" parent="HBoxContainer7"]
+[node name="AnimLoopToggleButton" type="Button" parent="VBoxContainer/HBoxContainer7"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -60,7 +67,7 @@ icon = ExtResource("4_lp60t")
 icon_alignment = 1
 expand_icon = true
 
-[node name="AddCheckpointButton" type="Button" parent="HBoxContainer7"]
+[node name="AddCheckpointButton" type="Button" parent="VBoxContainer/HBoxContainer7"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -69,48 +76,48 @@ icon = ExtResource("6_68fmn")
 icon_alignment = 1
 expand_icon = true
 
-[node name="AnimSlider" type="HSlider" parent="."]
+[node name="AnimSlider" type="HSlider" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Visual feedback for current frame"
 tick_count = 10
 ticks_on_borders = true
 
-[node name="ExportOptions2" type="HBoxContainer" parent="."]
+[node name="ExportOptions2" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
 
-[node name="Label8" type="Label" parent="ExportOptions2"]
+[node name="Label8" type="Label" parent="VBoxContainer/ExportOptions2"]
 layout_mode = 2
 text = " START:"
 
-[node name="StartSpin" type="SpinBox" parent="ExportOptions2"]
+[node name="StartSpin" type="SpinBox" parent="VBoxContainer/ExportOptions2"]
 unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Set animation start frame"
 value = 1.0
 
-[node name="Label2" type="Label" parent="ExportOptions2"]
+[node name="Label2" type="Label" parent="VBoxContainer/ExportOptions2"]
 layout_mode = 2
 text = " END:"
 
-[node name="EndSpin" type="SpinBox" parent="ExportOptions2"]
+[node name="EndSpin" type="SpinBox" parent="VBoxContainer/ExportOptions2"]
 unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Set animation end frame"
 value = 30.0
 
-[node name="Label3" type="Label" parent="ExportOptions2"]
+[node name="Label3" type="Label" parent="VBoxContainer/ExportOptions2"]
 layout_mode = 2
 text = " FPS:"
 
-[node name="FpsSpin" type="SpinBox" parent="ExportOptions2"]
+[node name="FpsSpin" type="SpinBox" parent="VBoxContainer/ExportOptions2"]
 unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Set animation playback speed"
 max_value = 60.0
 value = 12.0
 
-[node name="FrameResetButton" type="Button" parent="ExportOptions2"]
+[node name="FrameResetButton" type="Button" parent="VBoxContainer/ExportOptions2"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -118,12 +125,13 @@ tooltip_text = "Reset animation parameters"
 icon = ExtResource("5_yxxfn")
 expand_icon = true
 
-[node name="Panel" type="Panel" parent="ExportOptions2"]
-custom_minimum_size = Vector2(72, 0)
+[node name="Panel" type="Panel" parent="VBoxContainer"]
+custom_minimum_size = Vector2(72, 65)
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="SavePointScrollContainer" type="ScrollContainer" parent="ExportOptions2/Panel"]
+[node name="SavePointScrollContainer" type="ScrollContainer" parent="VBoxContainer/Panel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -131,11 +139,16 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_vertical = 3
-vertical_scroll_mode = 0
+horizontal_scroll_mode = 0
 
-[node name="CheckpointButtonsContainer" type="GridContainer" parent="ExportOptions2/Panel/SavePointScrollContainer"]
+[node name="CheckpointButtonsContainer" type="GridContainer" parent="VBoxContainer/Panel/SavePointScrollContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-columns = 3
+columns = 7
+
+[node name="DeleteTrackButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+text = "DEL"

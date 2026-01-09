@@ -137,7 +137,7 @@ func _apply_default_settings():
 		rim_light.light_energy = DEFAULT_SETTINGS.rim_light.intensity
 		rim_light.light_color = DEFAULT_SETTINGS.rim_light.color
 		rim_light.rotation_degrees = DEFAULT_SETTINGS.rim_light.rotation
-		rim_light_check_button.button_pressed = DEFAULT_SETTINGS.fill_light.enabled
+		rim_light_check_button.button_pressed = DEFAULT_SETTINGS.rim_light.enabled
 
 # Key Light handlers
 func _on_key_light_toggled(enabled: bool):

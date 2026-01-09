@@ -1,8 +1,9 @@
-extends VBoxContainer
+extends HBoxContainer
 class_name Track
 
 signal request_create_checkpoint(track: Track)
 signal request_become_active(track: Track)
+signal request_delete_track(track: Track)
 
 @export var models_handler: Node = null
 
@@ -19,6 +20,7 @@ signal request_become_active(track: Track)
 
 @onready var add_checkpoint_button: Button = %AddCheckpointButton
 @onready var checkpoint_buttons_container: GridContainer = %CheckpointButtonsContainer
+@onready var delete_track_button: Button = %DeleteTrackButton
 
 # Animation control
 var animation_player: AnimationPlayer = null
@@ -69,6 +71,9 @@ func _ready():
 
 	if add_checkpoint_button:
 		add_checkpoint_button.pressed.connect(_on_add_checkpoint_pressed)
+	
+	if delete_track_button:
+		delete_track_button.pressed.connect(_on_delete_track_pressed)
 
 	_update_loop_button_visual()
 	_update_play_button_visual()
@@ -85,6 +90,10 @@ func set_active(active: bool) -> void:
 	is_active = active
 	modulate = Color(1,1,1, 1.0) if active else Color(0.95,0.95,0.95, 0.7)
 	_update_play_button_visual()
+
+# --- track management ---
+func _on_delete_track_pressed() -> void:
+	request_delete_track.emit(self)
 
 # --- checkpoints API ---
 func _on_add_checkpoint_pressed() -> void:
@@ -116,25 +125,48 @@ func _on_checkpoint_button_gui_input(event: InputEvent, checkpoint_index: int) -
 					models_handler.set_animation(anim_name)
 
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
-			if checkpoint_index in checkpoints:
-				checkpoints.erase(checkpoint_index)
-				checkpoint_animations.erase(checkpoint_index)
-				for child in checkpoint_buttons_container.get_children():
-					if child is Button and child.text == "CP " + str(checkpoint_index + 1):
-						child.queue_free()
-						break
-				print("Checkpoint " + str(checkpoint_index + 1) + " deleted")
+			_delete_checkpoint(checkpoint_index, event.get_global_position())
 
+
+func _delete_checkpoint(checkpoint_index: int, mouse_pos: Vector2) -> void:
+	if checkpoint_index not in checkpoints:
+		return
+	
+	# Find and remove the checkpoint
+	var checkpoint_array_index = checkpoints.find(checkpoint_index)
+	if checkpoint_array_index >= 0:
+		checkpoints.remove_at(checkpoint_array_index)
+	
+	checkpoint_animations.erase(checkpoint_index)
+	
+	# Find and remove the button
+	for child in checkpoint_buttons_container.get_children():
+		if child is Button:
+			var button_cp_index = _get_checkpoint_index_from_button(child)
+			if button_cp_index == checkpoint_index:
+				child.queue_free()
+				break
+	
+	print("Checkpoint " + str(checkpoint_index + 1) + " deleted")
+
+func _get_checkpoint_index_from_button(button: Button) -> int:
+	# Extract checkpoint index from button text "CP X"
+	var text = button.text
+	var parts = text.split(" ")
+	if parts.size() >= 2:
+		return int(parts[1]) - 1
+	return -1
 
 func get_checkpoint_indices() -> Array:
 	if not checkpoint_buttons_container:
 		return []
 		
 	var enabled_indices = []
-	for i in range(checkpoint_buttons_container.get_child_count()):
-		var button = checkpoint_buttons_container.get_child(i)
-		if button is Button:
-			enabled_indices.append(checkpoints[i])
+	for child in checkpoint_buttons_container.get_children():
+		if child is Button:
+			var cp_index = _get_checkpoint_index_from_button(child)
+			if cp_index >= 0 and cp_index in checkpoints:
+				enabled_indices.append(cp_index)
 	return enabled_indices
 
 # --- animation population & frame controls ---
@@ -199,7 +231,7 @@ func _on_loop_toggle_pressed() -> void:
 
 # --- manual playback update ---
 func _process(delta: float) -> void:
-	if not animation_player or not is_active or selected_animation_name == "":
+	if not animation_player or not is_active or selected_animation_name == "" or not is_playing:
 		return
 	if is_slider_being_dragged:
 		return
@@ -207,15 +239,14 @@ func _process(delta: float) -> void:
 	var trimmed_start_time = start_frame / animation_fps
 	var trimmed_duration = _get_trimmed_duration()
 	
-	if is_playing:
-		current_time += delta
-		if current_time >= (end_frame / animation_fps):
-			if is_loop_enabled:
-				current_time = trimmed_start_time
-			else:
-				current_time = trimmed_start_time
-				is_playing = false
-				_update_play_button_visual()
+	current_time += delta
+	if current_time >= (end_frame / animation_fps):
+		if is_loop_enabled:
+			current_time = trimmed_start_time
+		else:
+			current_time = trimmed_start_time
+			is_playing = false
+			_update_play_button_visual()
 	
 	animation_player.play(selected_animation_name)
 	animation_player.seek(current_time, true)

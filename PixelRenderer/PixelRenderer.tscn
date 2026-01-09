@@ -1,10 +1,9 @@
-[gd_scene load_steps=44 format=3 uid="uid://y4o6ttmh8hb4"]
+[gd_scene load_steps=43 format=3 uid="uid://y4o6ttmh8hb4"]
 
 [ext_resource type="Script" uid="uid://dhq1ywbp8nv12" path="res://PixelRenderer/data/scripts/PixelRenderer.gd" id="1_5ibnk"]
 [ext_resource type="Material" uid="uid://dn8s72rfum4y4" path="res://PixelRenderer/data/Gizmo.tres" id="2_6vt7t"]
 [ext_resource type="Theme" uid="uid://bcwmv53i5brfs" path="res://PixelRenderer/data/theme.tres" id="2_l23g4"]
 [ext_resource type="Material" uid="uid://bmhdt60ax1int" path="res://PixelRenderer/data/PixelMaterial.tres" id="3_v52r1"]
-[ext_resource type="Script" uid="uid://djqlmm1nu56mi" path="res://PixelRenderer/data/scripts/main_config_scroll_container.gd" id="4_g6ha7"]
 [ext_resource type="Texture2D" uid="uid://75s28vduypuu" path="res://PixelRenderer/data/icons/folder.png" id="4_sen5r"]
 [ext_resource type="Texture2D" uid="uid://d3o8isbpbhfrw" path="res://PixelRenderer.png" id="4_x1hdl"]
 [ext_resource type="Texture2D" uid="uid://duc0vk1lm3pej" path="res://PixelRenderer/data/icons/arrow_up.png" id="7_klpv1"]
@@ -184,7 +183,6 @@ size_flags_horizontal = 3
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-script = ExtResource("4_g6ha7")
 
 [node name="LeftPanel" type="VBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/MainConfigScrollContainer"]
 layout_mode = 2
@@ -1129,10 +1127,9 @@ horizontal_alignment = 2
 [node name="TabContainer" type="TabContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer"]
 layout_mode = 2
 size_flags_vertical = 3
-current_tab = 1
+current_tab = 0
 
 [node name="Console" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/TabContainer"]
-visible = false
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 10
@@ -1149,47 +1146,36 @@ deselect_on_focus_loss_enabled = false
 drag_and_drop_selection_enabled = false
 script = ExtResource("28_e8x0m")
 
-[node name="Timeline" type="VBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/TabContainer"]
+[node name="Panel" type="Panel" parent="CanvasLayer/MainUI"]
 layout_mode = 2
-metadata/_tab_index = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/TabContainer/Timeline"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="TracksContainer" type="VBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/TabContainer/Timeline/ScrollContainer"]
-unique_name_in_owner = true
+[node name="TabContainer" type="TabContainer" parent="CanvasLayer/MainUI"]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 3
+size_flags_stretch_ratio = 0.4
+current_tab = 0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/TabContainer/Timeline"]
-layout_mode = 2
-alignment = 1
-
-[node name="AddTrackButton" type="Button" parent="CanvasLayer/MainUI/HBoxContainer/HSplitContainer/Renderer/TabContainer/Timeline/HBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Add Track"
-
-[node name="RenderConfigFoldableContainer" type="FoldableContainer" parent="CanvasLayer/MainUI"]
+[node name="RenderConfig" type="Panel" parent="CanvasLayer/MainUI/TabContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.0
-title = "Render Config"
-title_position = 1
-title_text_overrun_behavior = 2
+metadata/_tab_index = 0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer"]
-layout_mode = 2
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI/TabContainer/RenderConfig"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="UI_Controls" type="VBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer"]
+[node name="UI_Controls" type="VBoxContainer" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -1198,42 +1184,42 @@ text = "PRESET CONFIG"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="PresetSelector" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PresetSelector" type="HBoxContainer" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="PresetOptionButton" type="OptionButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PresetSelector"]
+[node name="PresetOptionButton" type="OptionButton" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PresetSelector"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 clip_text = true
 fit_to_longest_item = false
 
-[node name="SearchTextLineEdit" type="LineEdit" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PresetSelector"]
+[node name="SearchTextLineEdit" type="LineEdit" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PresetSelector"]
 unique_name_in_owner = true
 clip_contents = true
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 placeholder_text = "search "
 
-[node name="SavePresetButton" type="Button" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PresetSelector"]
+[node name="SavePresetButton" type="Button" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PresetSelector"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 icon = ExtResource("22_6vt7t")
 expand_icon = true
 
-[node name="DeletePresetButton" type="Button" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PresetSelector"]
+[node name="DeletePresetButton" type="Button" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PresetSelector"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 icon = ExtResource("23_ilx0h")
 expand_icon = true
 
-[node name="HSeparator7" type="HSeparator" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="HSeparator7" type="HSeparator" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 layout_mode = 2
 
-[node name="Label4" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="Label4" type="Label" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -1242,48 +1228,48 @@ text = "COLOR ADJUSTMENTS"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="Panel" type="Panel" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="Panel" type="Panel" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 layout_mode = 2
 
-[node name="PixelAdjust1" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust1" type="HBoxContainer" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust1"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust1"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Color steps:"
 horizontal_alignment = 2
 
-[node name="ColorStepsSpin" type="SpinBox" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust1"]
+[node name="ColorStepsSpin" type="SpinBox" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust1"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4
 value = 8.0
 allow_greater = true
 
-[node name="Label2" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust1"]
+[node name="Label2" type="Label" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust1"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ResetMaterialButton" type="Button" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust1"]
+[node name="ResetMaterialButton" type="Button" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust1"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 icon = ExtResource("9_ilx0h")
 expand_icon = true
 
-[node name="PixelAdjust2" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust2" type="HBoxContainer" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust2"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust2"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Edge strength:"
 horizontal_alignment = 2
 
-[node name="EdgeStrengthSlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust2"]
+[node name="EdgeStrengthSlider" type="HSlider" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust2"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -1292,17 +1278,17 @@ size_flags_vertical = 4
 max_value = 5.0
 step = 0.5
 
-[node name="PixelAdjust3" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust3" type="HBoxContainer" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust3"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust3"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Sharpness:"
 horizontal_alignment = 2
 
-[node name="SharpnessSlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust3"]
+[node name="SharpnessSlider" type="HSlider" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust3"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -1311,17 +1297,17 @@ size_flags_vertical = 4
 max_value = 5.0
 step = 0.1
 
-[node name="PixelAdjust4" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust4" type="HBoxContainer" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust4"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust4"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Hue shift:"
 horizontal_alignment = 2
 
-[node name="HueShiftSlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust4"]
+[node name="HueShiftSlider" type="HSlider" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust4"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -1330,17 +1316,17 @@ size_flags_vertical = 4
 min_value = -180.0
 max_value = 180.0
 
-[node name="PixelAdjust5" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust5" type="HBoxContainer" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust5"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust5"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Saturation:"
 horizontal_alignment = 2
 
-[node name="SaturationSlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust5"]
+[node name="SaturationSlider" type="HSlider" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust5"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -1350,17 +1336,17 @@ max_value = 2.0
 step = 0.1
 value = 1.0
 
-[node name="PixelAdjust6" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust6" type="HBoxContainer" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust6"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust6"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Value:"
 horizontal_alignment = 2
 
-[node name="ValueSlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust6"]
+[node name="ValueSlider" type="HSlider" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust6"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -1370,17 +1356,17 @@ max_value = 2.0
 step = 0.1
 value = 1.0
 
-[node name="PixelAdjust7" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust7" type="HBoxContainer" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust7"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust7"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Contrast:"
 horizontal_alignment = 2
 
-[node name="ContrastSlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust7"]
+[node name="ContrastSlider" type="HSlider" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust7"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -1390,17 +1376,17 @@ max_value = 5.0
 step = 0.1
 value = 1.0
 
-[node name="PixelAdjust8" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust8" type="HBoxContainer" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust8"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust8"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Gamma:"
 horizontal_alignment = 2
 
-[node name="GammaSlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust8"]
+[node name="GammaSlider" type="HSlider" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust8"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -1410,17 +1396,17 @@ max_value = 5.0
 step = 0.1
 value = 1.0
 
-[node name="PixelAdjust9" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust9" type="HBoxContainer" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust9"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust9"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Brightness:"
 horizontal_alignment = 2
 
-[node name="BrightnessSlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust9"]
+[node name="BrightnessSlider" type="HSlider" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust9"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -1430,29 +1416,29 @@ min_value = -1.0
 max_value = 1.0
 step = 0.1
 
-[node name="PixelAdjust10" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust10" type="HBoxContainer" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust10"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust10"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Outline:"
 horizontal_alignment = 2
 
-[node name="OutlineSpinBox" type="SpinBox" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust10"]
+[node name="OutlineSpinBox" type="SpinBox" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust10"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="OutlineColorPicker" type="ColorPickerButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust10"]
+[node name="OutlineColorPicker" type="ColorPickerButton" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust10"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 
-[node name="HSeparator10" type="HSeparator" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="HSeparator10" type="HSeparator" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 layout_mode = 2
 
-[node name="Label2" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="Label2" type="Label" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -1461,17 +1447,17 @@ text = "DITHERING"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="PixelAdjust12" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust12" type="HBoxContainer" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust12"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust12"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Amount:"
 horizontal_alignment = 2
 
-[node name="DitherAmountSlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust12"]
+[node name="DitherAmountSlider" type="HSlider" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust12"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -1479,17 +1465,17 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 step = 0.01
 
-[node name="PixelAdjust13" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust13" type="HBoxContainer" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust13"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust13"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Blend:"
 horizontal_alignment = 2
 
-[node name="DitherBlendSlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust13"]
+[node name="DitherBlendSlider" type="HSlider" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust13"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -1497,17 +1483,17 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 step = 0.01
 
-[node name="PixelAdjust14" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust14" type="HBoxContainer" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust14"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust14"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Threshold:"
 horizontal_alignment = 2
 
-[node name="DitherThresholdSlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust14"]
+[node name="DitherThresholdSlider" type="HSlider" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust14"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
@@ -1515,53 +1501,53 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 step = 0.01
 
-[node name="PixelAdjust15" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust15" type="HBoxContainer" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust15"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust15"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Sensitivity:"
 horizontal_alignment = 2
 
-[node name="DitherSensitivitySlider" type="HSlider" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust15"]
+[node name="DitherSensitivitySlider" type="HSlider" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust15"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="PixelAdjust16" type="HBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="PixelAdjust16" type="HBoxContainer" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust16"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust16"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 text = "Dot size"
 horizontal_alignment = 2
 
-[node name="DitherDotSizeSpin" type="SpinBox" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust16"]
+[node name="DitherDotSizeSpin" type="SpinBox" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust16"]
 unique_name_in_owner = true
 layout_mode = 2
 step = 0.1
 value = 1.0
 
-[node name="DitherDotColor" type="ColorPickerButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/PixelAdjust16"]
+[node name="DitherDotColor" type="ColorPickerButton" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/PixelAdjust16"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 
-[node name="HSeparator9" type="HSeparator" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="HSeparator9" type="HSeparator" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 layout_mode = 2
 
-[node name="Panel2" type="Panel" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls"]
+[node name="Panel2" type="Panel" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_x1hdl")
 
-[node name="TextureRect" type="TextureRect" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/UI_Controls/Panel2"]
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/UI_Controls/Panel2"]
 clip_contents = true
 layout_mode = 1
 anchors_preset = 15
@@ -1574,11 +1560,11 @@ texture = SubResource("ViewportTexture_6vt7t")
 expand_mode = 1
 stretch_mode = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -1587,7 +1573,7 @@ text = "COLORS"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="UsePaletteCheckButton" type="CheckButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="UsePaletteCheckButton" type="CheckButton" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
@@ -1597,61 +1583,83 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_6vt7t")
 text = " REMAP"
 alignment = 1
 
-[node name="ColorPresetOptionButton" type="OptionButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="ColorPresetOptionButton" type="OptionButton" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 clip_text = true
 fit_to_longest_item = false
 
-[node name="UsePaletteColor1" type="ColorPickerButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="UsePaletteColor1" type="ColorPickerButton" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="UsePaletteColor2" type="ColorPickerButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="UsePaletteColor2" type="ColorPickerButton" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="UsePaletteColor3" type="ColorPickerButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="UsePaletteColor3" type="ColorPickerButton" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="UsePaletteColor4" type="ColorPickerButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="UsePaletteColor4" type="ColorPickerButton" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="UsePaletteColor5" type="ColorPickerButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="UsePaletteColor5" type="ColorPickerButton" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="UsePaletteColor6" type="ColorPickerButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="UsePaletteColor6" type="ColorPickerButton" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="UsePaletteColor7" type="ColorPickerButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="UsePaletteColor7" type="ColorPickerButton" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="UsePaletteColor8" type="ColorPickerButton" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="UsePaletteColor8" type="ColorPickerButton" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="SampleColorsButton" type="Button" parent="CanvasLayer/MainUI/RenderConfigFoldableContainer/HBoxContainer/VBoxContainer"]
+[node name="SampleColorsButton" type="Button" parent="CanvasLayer/MainUI/TabContainer/RenderConfig/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "SAMPLE"
 
-[node name="Panel" type="Panel" parent="CanvasLayer/MainUI"]
+[node name="Timeline" type="VBoxContainer" parent="CanvasLayer/MainUI/TabContainer"]
+visible = false
 layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/MainUI/TabContainer/Timeline"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="TracksContainer" type="VBoxContainer" parent="CanvasLayer/MainUI/TabContainer/Timeline/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/MainUI/TabContainer/Timeline"]
+layout_mode = 2
+alignment = 1
+
+[node name="AddTrackButton" type="Button" parent="CanvasLayer/MainUI/TabContainer/Timeline/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Add Track"
 
 [node name="ModelsHandler" type="Node3D" parent="."]
 unique_name_in_owner = true

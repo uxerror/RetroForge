@@ -30,6 +30,7 @@ var current_animation_player: AnimationPlayer = null
 var auto_refresh_timer: Timer
 var last_animation_count: int = 0
 var last_model_node_count: int = 0
+var refresh_check_interval: float = 2.0  # Increase from 1.0 to 2.0 seconds
 
 # Reference to pixel_material
 var pixel_material_script: Node
@@ -55,7 +56,7 @@ func _ready():
 # ------------------------------------------------
 func _setup_auto_refresh():
 	auto_refresh_timer = Timer.new()
-	auto_refresh_timer.wait_time = 1.0
+	auto_refresh_timer.wait_time = refresh_check_interval
 	auto_refresh_timer.timeout.connect(_on_auto_refresh_timer_timeout)
 	add_child(auto_refresh_timer)
 	auto_refresh_timer.start()
@@ -112,6 +113,11 @@ func _on_add_track_pressed():
 	tracks_container.add_child(track)
 
 	track.request_become_active.connect(_on_track_request_become_active)
+	
+	# Pass models_handler reference if available
+	var pixel_renderer = get_node_or_null("../../")
+	if pixel_renderer and pixel_renderer.has_node("ModelsHandler"):
+		track.models_handler = pixel_renderer.get_node("ModelsHandler")
 
 	if current_animation_player != null:
 		track.set_animation_player(current_animation_player)

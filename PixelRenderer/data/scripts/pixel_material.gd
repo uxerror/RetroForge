@@ -1001,8 +1001,9 @@ func _sample_dominant_colors(image: Image, num_colors: int) -> Array[Color]:
 	var color_counts: Dictionary = {}
 	var total_pixels: int = 0
 	
-	# Sample every nth pixel to improve performance (adjust step for quality vs speed)
-	var step = max(1, int(sqrt(image.get_width() * image.get_height()) / 100))
+	# Sample every nth pixel to improve performance (optimized for larger images)
+	var pixel_count = image.get_width() * image.get_height()
+	var step = max(1, int(sqrt(pixel_count) / 50))  # More aggressive sampling for better performance
 	
 	# Count color occurrences (with some color grouping to avoid too many similar colors)
 	for y in range(0, image.get_height(), step):

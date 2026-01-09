@@ -56,6 +56,8 @@ var cached_texture: ImageTexture
 
 # Base canvas size - always 800x800
 const BASE_CANVAS_SIZE: int = 800
+# Minimum intermediate size for quality downscaling
+const MIN_INTERMEDIATE_SIZE: int = 256
 
 # Animation export variables
 var animation_player: AnimationPlayer = null
@@ -66,12 +68,19 @@ var export_frame_index: int = 0
 
 var export_task_index: int = 0
 var export_frame_index_in_task: int = 0
+var previous_checkpoint_index: int = -1
 
 # Sprite sheet export variables
 var sprite_sheet_image: Image = null
 var sprite_sheet_width: int = 0
 var sprite_sheet_height: int = 0
 var frames_per_row: int = 0
+
+# Reusable capture viewport for export optimization
+var capture_viewport: SubViewport = null
+
+# Export FPS tracking
+var export_fps: int = 12
 
 
 func _ready():
@@ -149,6 +158,8 @@ func _connect_track_signals(track: Track):
 		track.request_create_checkpoint.connect(_on_track_request_create_checkpoint)
 	if track.has_signal("request_become_active"):
 		track.request_become_active.connect(_on_track_request_become_active)
+	if track.has_signal("request_delete_track"):
+		track.request_delete_track.connect(_on_track_request_delete)
 	track.models_handler = models_handler
 
 func _on_track_added(track: Node) -> void:
@@ -195,12 +206,25 @@ func _find_animation_player(node: Node) -> AnimationPlayer:
 	
 	return null
 
+func _force_update_transforms(node: Node) -> void:
+	"""Recursively force update all transforms in the node tree"""
+	if node is Node3D:
+		node.force_update_transform()
+	for child in node.get_children():
+		_force_update_transforms(child)
+
 func _start_export():
 	if is_exporting:
 		return
 	if export_directory == "":
 		console.log("No export directory selected, opening folder dialog...", console.WARN)
 		_on_select_folder_button_pressed()
+		return
+	
+	# Validate export resolution
+	var export_resolution = int(resolution.value)
+	if export_resolution <= 0:
+		console.log("ERROR: Invalid export resolution: " + str(export_resolution), console.WARN)
 		return
 	
 	# Stop all tracks before export
@@ -237,6 +261,12 @@ func _start_export():
 
 	console.log("Collected " + str(export_tasks.size()) + " export tasks (track x checkpoint). Total frames: " + str(total_frames), console.INFO)
 
+	# Store FPS for export report
+	if export_tasks.size() > 0:
+		var first_track: Track = export_tasks[0]["track"]
+		var first_settings = first_track.get_export_settings()
+		export_fps = int(first_settings["fps"])
+
 	# Sprite sheet init
 	if sprite_sheet_check_box.button_pressed:
 		var max_frames = 0
@@ -257,6 +287,7 @@ func _start_export():
 	progress_bar.value = 0
 	export_task_index = 0
 	export_frame_index_in_task = 0
+	previous_checkpoint_index = -1
 
 	if animation_player:
 		was_playing_before_export = animation_player.is_playing()
@@ -285,6 +316,10 @@ func _collect_export_tasks() -> Array:
 					continue
 					
 				var checkpoint_indices = track.get_checkpoint_indices()
+				if checkpoint_indices.is_empty():
+					console.log("WARNING: Track '" + track.get_selected_animation_name() + "' has no checkpoints, skipping", console.WARN)
+					continue
+					
 				for cp_index in checkpoint_indices:
 					tasks.append({"track": track, "checkpoint_index": cp_index})
 	
@@ -303,8 +338,10 @@ func _export_next_frame():
 	var frames = task["frames"]
 
 	if export_frame_index_in_task >= frames.size():
+		console.log("Task %d/%d completed (%s)" % [export_task_index + 1, export_tasks.size(), track.get_selected_animation_name()], console.OK)
 		export_task_index += 1
 		export_frame_index_in_task = 0
+		previous_checkpoint_index = -1  # Reset for next task
 		_export_next_frame()
 		return
 
@@ -322,12 +359,50 @@ func _export_next_frame():
 	],
 	console.INFO)
 
+	# Check if checkpoint changed (new task or different checkpoint)
+	# Always treat first frame of task as checkpoint change
+	var is_first_frame_of_task = (export_frame_index_in_task == 0)
+	var checkpoint_changed = (cp_index != previous_checkpoint_index) or is_first_frame_of_task
+	previous_checkpoint_index = cp_index
+	
 	if models_handler != null and models_handler.has_method("set_state"):
 		if cp_index >= 0 and cp_index < models_handler.checkpoints.size():
-			models_handler.set_state(models_handler.checkpoints[cp_index])
-			console.log("Applied checkpoint %d" % (cp_index + 1), console.INFO)
+			if checkpoint_changed:
+				# Apply checkpoint and wait for signal confirmation
+				models_handler.set_state(models_handler.checkpoints[cp_index], cp_index)
+				
+				# Wait for checkpoint_applied signal with timeout
+				var signal_received = false
+				var timeout_frames = 0
+				var max_timeout_frames = 60  # Max 1 second at 60fps
+				
+				var on_checkpoint_applied = func(index: int):
+					if index == cp_index:
+						signal_received = true
+				
+				models_handler.checkpoint_applied.connect(on_checkpoint_applied)
+				
+				# Wait for signal or timeout
+				while not signal_received and timeout_frames < max_timeout_frames:
+					await get_tree().process_frame
+					timeout_frames += 1
+				
+				models_handler.checkpoint_applied.disconnect(on_checkpoint_applied)
+				
+				if signal_received:
+					console.log("Checkpoint %d applied and verified" % (cp_index + 1), console.OK)
+				else:
+					console.log("WARNING: Checkpoint %d timeout after %d frames" % [cp_index + 1, timeout_frames], console.WARN)
+			else:
+				# No checkpoint change, just apply directly
+				models_handler.set_state(models_handler.checkpoints[cp_index], cp_index)
+				console.log("Checkpoint %d reapplied" % (cp_index + 1), console.INFO)
 		else:
-			console.log("WARNING: checkpoint index invalid", console.WARN)
+			console.log("ERROR: checkpoint index %d out of range (total: %d)" % [cp_index, models_handler.checkpoints.size()], console.WARN)
+			# Skip this frame if checkpoint is invalid
+			export_frame_index_in_task += 1
+			_export_next_frame()
+			return
 
 	var loaded_model = null
 	if models_spawner and models_spawner.has_method("get_loaded_model"):
@@ -353,20 +428,28 @@ func _export_next_frame():
 			
 			animation_player.play(anim_name)
 			animation_player.seek(target_time, true)
+			animation_player.advance(0)  # Force skeleton update
+			
+			# Force update transforms on the entire model tree
+			if loaded_model:
+				_force_update_transforms(loaded_model)
+			
 			console.log("Animation set to '%s' at %.3fs" % [anim_name, target_time], console.INFO)
 		else:
 			console.log("WARNING: Animation '%s' not found in AnimationPlayer" % anim_name, console.WARN)
 	else:
 		console.log("No AnimationPlayer or empty anim_name", console.WARN)
 
-	await get_tree().process_frame
+	# Wait for scene to fully update
 	await get_tree().process_frame
 	await get_tree().process_frame
 
 	var image = await _capture_control_node()
 	if image:
-		if not preview_image_check_box.button_pressed:
-			image = _scale_image_nearest_neighbor(image, int(resolution.value))
+		# Always scale to target resolution (preview mode shows base size)
+		var target_size = int(resolution.value)
+		if image.get_width() != target_size or image.get_height() != target_size:
+			image = _scale_image_nearest_neighbor(image, target_size)
 
 		if sprite_sheet_check_box.button_pressed:
 			var frame_size = int(resolution.value)
@@ -374,19 +457,29 @@ func _export_next_frame():
 			var col = export_frame_index_in_task
 			var dest_x = col * frame_size
 			var dest_y = row * frame_size
-			sprite_sheet_image.blit_rect(image, Rect2i(Vector2i(0,0), Vector2i(frame_size, frame_size)), Vector2i(dest_x, dest_y))
+			
+			# Verify dimensions before blitting
+			if dest_x + frame_size <= sprite_sheet_width and dest_y + frame_size <= sprite_sheet_height:
+				if image.get_width() == frame_size and image.get_height() == frame_size:
+					sprite_sheet_image.blit_rect(image, Rect2i(Vector2i(0,0), Vector2i(frame_size, frame_size)), Vector2i(dest_x, dest_y))
+				else:
+					console.log("WARNING: Image size mismatch. Expected %dx%d, got %dx%d" % [frame_size, frame_size, image.get_width(), image.get_height()], console.WARN)
+			else:
+				console.log("ERROR: Sprite sheet position out of bounds: %d,%d in %dx%d sheet" % [dest_x, dest_y, sprite_sheet_width, sprite_sheet_height], console.WARN)
 		else:
 			var prefix = prefix_text.text.strip_edges()
 			if prefix.is_empty():
 				prefix = "frame"
 			var track_label = "track"
 			if track and track.has_method("get_selected_animation_name"):
-				track_label = "track_" + str(track.get_selected_animation_name())
+				var track_anim_name = track.get_selected_animation_name()
+				if not track_anim_name.is_empty():
+					track_label = "track_" + str(track_anim_name)
 			var filename = "%s_%s_cp%02d_%04d.png" % [prefix, track_label, cp_index + 1, frame_to_render]
 			var filepath = export_directory.path_join(filename)
 			var err = image.save_png(filepath)
 			if err != OK:
-				console.log("ERROR: failed to save " + filepath + " code: " + str(err), console.WARN)
+				console.log("ERROR: failed to save " + filepath + " (error code: " + str(err) + ")", console.WARN)
 			else:
 				console.log("Saved: " + filepath, console.INFO)
 	else:
@@ -409,16 +502,15 @@ func _capture_control_node() -> Image:
 	
 	console.log("Capturing frame at size: " + str(size))
 	
-	# Create a SubViewport to render the control
-	var capture_viewport = SubViewport.new()
+	# Reuse existing capture viewport or create new one
+	if not capture_viewport:
+		capture_viewport = SubViewport.new()
+		capture_viewport.transparent_bg = true
+		add_child(capture_viewport)
+	
+	# Configure viewport for current capture
 	capture_viewport.size = Vector2i(size)
 	capture_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
-	
-	# Enable transparency in the SubViewport
-	capture_viewport.transparent_bg = true
-	
-	# Temporarily add the SubViewport to the scene
-	add_child(capture_viewport)
 	
 	# Clone the renderer node and its children
 	var renderer_clone = renderer.duplicate(DUPLICATE_USE_INSTANTIATION)
@@ -436,17 +528,13 @@ func _capture_control_node() -> Image:
 		# Clean up before returning
 		capture_viewport.remove_child(renderer_clone)
 		renderer_clone.queue_free()
-		remove_child(capture_viewport)
-		capture_viewport.queue_free()
 		return null
 	
 	var image = viewport_texture.get_image()
 	
-	# Clean up
+	# Clean up clone only (keep viewport for reuse)
 	capture_viewport.remove_child(renderer_clone)
 	renderer_clone.queue_free()
-	remove_child(capture_viewport)
-	capture_viewport.queue_free()
 	
 	if not image:
 		console.log("ERROR: Could not capture image from SubViewport")
@@ -463,8 +551,8 @@ func _capture_control_node() -> Image:
 
 func _scale_image_nearest_neighbor(source_image: Image, target_size: int) -> Image:
 	"""
-	Scale an image to target_size x target_size using nearest neighbor filtering
-	to preserve pixel art aesthetics
+	Scale an image to target_size x target_size with quality preservation for low resolutions
+	Uses two-stage scaling with averaging for better results at small sizes
 	"""
 	if not source_image:
 		console.log("ERROR: Source image is null for scaling")
@@ -480,35 +568,58 @@ func _scale_image_nearest_neighbor(source_image: Image, target_size: int) -> Ima
 	
 	console.log("Scaling image from " + str(source_width) + "x" + str(source_height) + " to " + str(target_size) + "x" + str(target_size))
 	
-	# Create a new image with the target size
-	var scaled_image = Image.create(target_size, target_size, false, Image.FORMAT_RGBA8)
+	var scale_ratio = float(source_width) / float(target_size)
 	
-	# Calculate scaling factors
-	var scale_x = float(source_width) / float(target_size)
-	var scale_y = float(source_height) / float(target_size)
+	# For very small sizes (scale ratio > 4), use two-stage scaling with averaging
+	if scale_ratio > 4.0:
+		return _two_stage_scale(source_image, target_size)
+	else:
+		# For moderate scaling, use simple nearest neighbor
+		var scaled_image = source_image.duplicate()
+		scaled_image.resize(target_size, target_size, Image.INTERPOLATE_NEAREST)
+		console.log("Image scaling completed (single-stage)")
+		return scaled_image
+
+func _two_stage_scale(source_image: Image, target_size: int) -> Image:
+	"""
+	Two-stage scaling: first with averaging to intermediate size, then nearest neighbor to target
+	This preserves more detail for very small target sizes
+	"""
+	var source_size = source_image.get_width()
 	
-	# Apply nearest neighbor scaling
-	for y in range(target_size):
-		for x in range(target_size):
-			# Find the nearest source pixel
-			var source_x = int(x * scale_x)
-			var source_y = int(y * scale_y)
-			
-			# Clamp to source image bounds
-			source_x = clamp(source_x, 0, source_width - 1)
-			source_y = clamp(source_y, 0, source_height - 1)
-			
-			# Get the pixel from source and set it in the scaled image
-			var pixel_color = source_image.get_pixel(source_x, source_y)
-			scaled_image.set_pixel(x, y, pixel_color)
+	# Calculate intermediate size (at least 4x target, but not more than source)
+	var intermediate_size = max(target_size * 4, MIN_INTERMEDIATE_SIZE)
+	intermediate_size = min(intermediate_size, source_size)
 	
-	console.log("Image scaling completed")
-	return scaled_image
+	if intermediate_size == target_size:
+		# No need for two-stage, go direct
+		var result = source_image.duplicate()
+		result.resize(target_size, target_size, Image.INTERPOLATE_NEAREST)
+		return result
+	
+	console.log("Two-stage scaling: %dx%d -> %dx%d -> %dx%d" % [source_size, source_size, intermediate_size, intermediate_size, target_size, target_size])
+	
+	# Stage 1: Scale down to intermediate size with bilinear (averaging)
+	var intermediate_image = source_image.duplicate()
+	intermediate_image.resize(intermediate_size, intermediate_size, Image.INTERPOLATE_BILINEAR)
+	
+	# Stage 2: Scale to final size with nearest neighbor (pixel art look)
+	var final_image = intermediate_image.duplicate()
+	final_image.resize(target_size, target_size, Image.INTERPOLATE_NEAREST)
+	
+	console.log("Two-stage scaling completed")
+	return final_image
 
 func _finish_export():
 	is_exporting = false
 	export_button.text = "Export"
 	export_button.disabled = false
+	
+	# Clean up capture viewport after export completes
+	if capture_viewport:
+		remove_child(capture_viewport)
+		capture_viewport.queue_free()
+		capture_viewport = null
 	
 	# Restore animation player state
 	if animation_player:
@@ -533,9 +644,10 @@ func _finish_export():
 		var filepath = export_directory.path_join(prefix + "_tileset.png")
 		var err = sprite_sheet_image.save_png(filepath)
 		if err != OK:
-			console.log("ERROR: failed to save sprite sheet " + filepath)
+			console.log("ERROR: failed to save sprite sheet " + filepath + " (error code: " + str(err) + ")", console.WARN)
 		else:
-			console.log("Sprite sheet saved: " + filepath)
+			console.log("Sprite sheet saved: " + filepath, console.OK)
+			console.log("Sprite sheet dimensions: " + str(sprite_sheet_width) + "x" + str(sprite_sheet_height), console.INFO)
 
 	# Complete the progress bar
 	progress_bar.value = 100
@@ -544,19 +656,22 @@ func _finish_export():
 	console.log("EXPORT COMPLETED!")
 	console.log("Total frames exported: " + str(total_frames))
 	console.log("Export location: " + export_directory)
-	console.log("Frame rate: " + str(fps) + " FPS")
+	console.log("Frame rate: " + str(export_fps) + " FPS")
 	if sprite_sheet_check_box.button_pressed:
 		console.log("Export mode: SPRITE SHEET")
 	else:
 		console.log("Export mode: FRAME SEQUENCE")
 	console.log("------------------------------")
 	
+	# Clean up sprite sheet resources
+	sprite_sheet_image = null
+	
 	_show_completion_message(total_frames)
 
 
 func _show_completion_message(frame_count: int):
 	# You can implement a popup or notification here
-	console.log("Animation export finished: " + str(frame_count) + " frames at " + str(fps) + " FPS")
+	console.log("Animation export finished: " + str(frame_count) + " frames at " + str(export_fps) + " FPS")
 	console.log("You can now create animations or GIFs from the exported frames")
 
 func _update_canvas():
@@ -665,3 +780,37 @@ func _on_track_request_become_active(track):
 		for t: Track in tracks_container.get_children():
 			if t.has_method("set_active"):
 				t.set_active(t == track)
+
+func _on_track_request_delete(track: Track):
+	print("test")
+	if not track or not tracks_container:
+		return
+	
+	# Check if this is the last track
+	var track_count = 0
+	for t in tracks_container.get_children():
+		if t is Track:
+			track_count += 1
+	
+	if track_count <= 1:
+		console.log("Cannot delete the last track", console.WARN)
+		return
+	
+	# Disconnect signals before removing
+	if track.has_signal("request_create_checkpoint"):
+		if track.request_create_checkpoint.is_connected(_on_track_request_create_checkpoint):
+			track.request_create_checkpoint.disconnect(_on_track_request_create_checkpoint)
+	
+	if track.has_signal("request_become_active"):
+		if track.request_become_active.is_connected(_on_track_request_become_active):
+			track.request_become_active.disconnect(_on_track_request_become_active)
+	
+	if track.has_signal("request_delete_track"):
+		if track.request_delete_track.is_connected(_on_track_request_delete):
+			track.request_delete_track.disconnect(_on_track_request_delete)
+	
+	var track_name = track.get_selected_animation_name()
+	tracks_container.remove_child(track)
+	track.queue_free()
+	
+	console.log("Track '" + track_name + "' deleted", console.OK)

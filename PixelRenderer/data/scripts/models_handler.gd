@@ -2,6 +2,7 @@ extends Node3D
 class_name ModelsHandler
 
 signal added_checkpoint(index: int)
+signal checkpoint_applied(index: int)
 
 # --- Constants ---
 const DEFAULT_ROTATION_DELTA := 45.0
@@ -48,6 +49,9 @@ const CAMERA_PRESETS := {
 
 # --- Data storage ---
 var checkpoints: Array = []   # массив точек сохранения
+var target_state: Dictionary = {}  # Целевое состояние для проверки
+var applying_checkpoint: bool = false
+var current_checkpoint_index: int = -1
 
 # --- Delta getters/setters ---
 func _get_rotation_model_delta() -> float: return rotation_model_delta
@@ -75,6 +79,17 @@ func _ready() -> void:
 	camera_ctl.preset_select.item_selected.connect(_on_camera_preset_selected)
 
 	reset_all()
+
+func _process(_delta: float) -> void:
+	if applying_checkpoint and not target_state.is_empty():
+		# Проверяем, что трансформации применились
+		if _check_state_applied():
+			applying_checkpoint = false
+			var cp_index = current_checkpoint_index
+			current_checkpoint_index = -1
+			target_state.clear()
+			checkpoint_applied.emit(cp_index)
+			print("Checkpoint ", cp_index + 1, " fully applied and verified")
 
 # --- Initialize a control group (model or camera) ---
 func _init_controls(group, update_pos, update_rot, get_delta: Callable, set_delta: Callable, reset_pos, reset_rot) -> void:
@@ -115,6 +130,39 @@ func reset_all() -> void:
 	_reset_camera_position()
 	_reset_camera_rotation()
 	_reset_zoom()
+
+func _check_state_applied() -> bool:
+	"""Check if target state has been applied to actual transforms"""
+	if target_state.is_empty():
+		return true
+	
+	const EPSILON = 0.001
+	
+	# Check model position
+	if target_state.has("model") and target_state.model.has("position"):
+		var target_pos: Vector3 = target_state.model.position
+		if position.distance_to(target_pos) > EPSILON:
+			return false
+	
+	# Check model rotation
+	if target_state.has("model") and target_state.model.has("rotation"):
+		var target_rot: Vector3 = target_state.model.rotation
+		if rotation_degrees.distance_to(target_rot) > EPSILON:
+			return false
+	
+	# Check camera position
+	if camera and target_state.has("camera") and target_state.camera.has("position"):
+		var target_cam_pos: Vector3 = target_state.camera.position
+		if camera.position.distance_to(target_cam_pos) > EPSILON:
+			return false
+	
+	# Check camera rotation
+	if camera and target_state.has("camera") and target_state.camera.has("rotation"):
+		var target_cam_rot: Vector3 = target_state.camera.rotation
+		if camera.rotation_degrees.distance_to(target_cam_rot) > EPSILON:
+			return false
+	
+	return true
 
 # --- Helpers ---
 func _rotate_spinbox(spinbox: SpinBox, delta: float, callback: Callable) -> void:
@@ -228,7 +276,12 @@ func get_state() -> Dictionary:
 		}
 	}
 
-func set_state(state: Dictionary) -> void:
+func set_state(state: Dictionary, checkpoint_index: int = -1) -> void:
+	# Store target state for verification
+	target_state = state.duplicate(true)
+	current_checkpoint_index = checkpoint_index
+	applying_checkpoint = true
+	
 	if state.has("model"):
 		if state.model.has("position"):
 			position = state.model.position
@@ -259,6 +312,11 @@ func set_state(state: Dictionary) -> void:
 		if state.camera.has("zoom"):
 			camera.size = state.camera.zoom
 			if camera_ctl.zoom_spin: camera_ctl.zoom_spin.value = state.camera.zoom
+	
+	# Force immediate transform update
+	force_update_transform()
+	if camera:
+		camera.force_update_transform()
 
 # --- Public methods for checkpoint creation ---
 func create_checkpoint() -> int:
